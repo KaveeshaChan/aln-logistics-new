@@ -191,6 +191,7 @@ function MobileMenu({
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [active, setActive] = useState<string | null>(null);
 
   const handleResize = useCallback(() => {
     if (window.innerWidth >= 1024) setIsOpen(false);
@@ -200,6 +201,40 @@ export function Navbar() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [handleResize]);
+
+  // Scroll spy — highlight the nav link of the section currently in view
+  useEffect(() => {
+    const sections = navLinks
+      .map((link) => document.querySelector(link.href))
+      .filter((el): el is Element => el !== null);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActive(`#${entry.target.id}`);
+        }
+      },
+      // A thin band around the middle of the viewport decides the active section
+      { rootMargin: "-40% 0px -55% 0px", threshold: 0 },
+    );
+
+    sections.forEach((el) => observer.observe(el));
+
+    // Clear the highlight when scrolled back up to the hero
+    const hero = document.querySelector("#home");
+    const heroObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) setActive(null);
+      },
+      { rootMargin: "-30% 0px -60% 0px", threshold: 0 },
+    );
+    if (hero) heroObserver.observe(hero);
+
+    return () => {
+      observer.disconnect();
+      heroObserver.disconnect();
+    };
+  }, []);
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-transparent">
@@ -213,21 +248,36 @@ export function Navbar() {
 
           <NavigationMenu className="max-lg:hidden rounded-full bg-white p-1.5 shadow-lg shadow-brand/5 z-10 absolute left-1/2 -translate-x-1/2">
             <NavigationMenuList className="flex gap-1.5">
-              {navLinks.map((link, i) => (
-                <NavigationMenuItem key={link.href}>
-                  <NavigationMenuLink
-                    href={link.href}
-                    className={cn(
-                      "rounded-full px-6 py-2.5 text-sm font-semibold tracking-wide outline outline-transparent transition-all",
-                      i === 0
-                        ? "bg-black text-white shadow-sm"
-                        : "text-black hover:bg-black/5"
-                    )}
-                  >
-                    {link.label}
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = active === link.href;
+                return (
+                  <NavigationMenuItem key={link.href}>
+                    <NavigationMenuLink
+                      href={link.href}
+                      onClick={() => setActive(link.href)}
+                      className={cn(
+                        "relative rounded-full px-6 py-2.5 text-sm font-semibold tracking-wide outline outline-transparent transition-colors duration-300",
+                        isActive
+                          ? "text-white"
+                          : "text-black hover:bg-black/5",
+                      )}
+                    >
+                      {isActive && (
+                        <motion.span
+                          layoutId="nav-active-pill"
+                          transition={{
+                            type: "spring",
+                            stiffness: 380,
+                            damping: 32,
+                          }}
+                          className="absolute inset-0 -z-10 rounded-full bg-black shadow-sm"
+                        />
+                      )}
+                      {link.label}
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                );
+              })}
             </NavigationMenuList>
           </NavigationMenu>
 
