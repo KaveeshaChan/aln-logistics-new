@@ -1,199 +1,239 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  ArrowRight01Icon,
-  CheckmarkCircle02Icon,
-  GlobalIcon,
-} from "@hugeicons/core-free-icons";
-import { motion } from "motion/react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { AnimatePresence, motion, type Variants } from "motion/react";
 
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarGroup,
+  AvatarGroupCount,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { img, PHOTOS } from "@/lib/site";
+import { Eyebrow } from "@/components/ui/eyebrow";
+import { heroSlides, img, PHOTOS, stats } from "@/lib/site";
 
 const ease = [0.22, 1, 0.36, 1] as const;
+const AUTOPLAY_MS = 6000;
 
-const container = {
+const copyContainer: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
+  exit: { transition: { staggerChildren: 0.03, staggerDirection: -1 } },
 };
-const item = {
-  hidden: { opacity: 0, y: 26 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease } },
+
+const copyItem: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease } },
+  exit: { opacity: 0, y: -16, transition: { duration: 0.35, ease } },
+};
+
+const wordContainer: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.045 } },
+  exit: { transition: { staggerChildren: 0.02, staggerDirection: -1 } },
+};
+
+const word: Variants = {
+  hidden: { y: "110%", opacity: 0 },
+  show: { y: 0, opacity: 1, transition: { duration: 0.55, ease } },
+  exit: { y: "-110%", opacity: 0, transition: { duration: 0.35, ease } },
 };
 
 export function Hero() {
+  const [index, setIndex] = useState(0);
+  const nextIndex = (index + 1) % heroSlides.length;
+  const slide = heroSlides[index];
+
+  useEffect(() => {
+    const timer = setTimeout(
+      () => setIndex((i) => (i + 1) % heroSlides.length),
+      AUTOPLAY_MS,
+    );
+    return () => clearTimeout(timer);
+  }, [index]);
+
   return (
     <section
       id="home"
-      className="relative flex min-h-[100svh] items-center overflow-hidden pt-28 pb-16"
+      className="relative isolate flex min-h-[100svh] items-center overflow-hidden"
     >
-      {/* Background image + overlays */}
-      <div className="absolute inset-0 -z-10">
-        <Image
-          src={img(PHOTOS.heroPort, 2000, 70)}
-          alt="Aerial view of an automobile shipping port"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-ink/95 via-ink/80 to-brand/60" />
-        <div className="absolute inset-0 bg-[radial-gradient(120%_120%_at_80%_10%,transparent,rgba(10,15,40,0.85))]" />
-      </div>
-
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 sm:px-8 lg:grid-cols-[1.35fr_1fr] lg:items-center">
-        {/* Copy */}
-        <motion.div variants={container} initial="hidden" animate="show">
+      {/* Background crossfade */}
+      <div className="absolute inset-0 -z-10 bg-ink">
+        <AnimatePresence>
           <motion.div
-            variants={item}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-medium text-white/90 backdrop-blur"
+            key={index}
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.3, ease }}
           >
-            <span className="grid size-4 place-items-center rounded-full bg-gold text-gold-foreground">
-              <HugeiconsIcon icon={GlobalIcon} size={11} />
-            </span>
-            A global automobile logistics network
-          </motion.div>
-
-          <motion.h1
-            variants={item}
-            className="mt-6 max-w-2xl font-heading text-4xl font-extrabold leading-[1.05] tracking-tight text-white text-balance sm:text-5xl lg:text-6xl"
-          >
-            The reliable logistics network{" "}
-            <span className="text-gold">automakers</span> count on.
-          </motion.h1>
-
-          <motion.p
-            variants={item}
-            className="mt-6 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg"
-          >
-            ALN unites handpicked freight forwarders in every major country that
-            imports and exports vehicles — delivering end-to-end automobile
-            logistics by sea, road, rail and air at low cost with a high return.
-          </motion.p>
-
-          <motion.div
-            variants={item}
-            className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center"
-          >
-            <Button
-              size="lg"
-              className="h-12 rounded-full bg-gold px-6 text-sm font-semibold text-gold-foreground hover:bg-gold/90"
-              render={<a href="#contact" />}
+            <motion.div
+              className="absolute inset-0"
+              initial={{ scale: 1 }}
+              animate={{ scale: 1.08 }}
+              transition={{
+                duration: AUTOPLAY_MS / 1000 + 1.3,
+                ease: "linear",
+              }}
             >
-              Get in Touch
-              <HugeiconsIcon icon={ArrowRight01Icon} />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="h-12 rounded-full border-white/25 bg-white/5 px-6 text-sm font-semibold text-white hover:bg-white/15 hover:text-white"
-              render={<a href="#services" />}
-            >
-              Explore Services
-            </Button>
-          </motion.div>
-
-          <motion.ul
-            variants={item}
-            className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-sm text-white/70"
-          >
-            {["One partner per country", "Vetted specialists", "Door-to-door coverage"].map(
-              (f) => (
-                <li key={f} className="flex items-center gap-2">
-                  <HugeiconsIcon
-                    icon={CheckmarkCircle02Icon}
-                    size={18}
-                    className="text-gold"
-                  />
-                  {f}
-                </li>
-              ),
-            )}
-          </motion.ul>
-        </motion.div>
-
-        {/* Floating spotlight card */}
-        <motion.div
-          initial={{ opacity: 0, y: 40, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.5, ease }}
-          className="relative mx-auto w-full max-w-sm lg:mx-0"
-        >
-          <motion.div
-            animate={{ y: [0, -12, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-3 shadow-2xl shadow-black/40 backdrop-blur-xl"
-          >
-            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
               <Image
-                src={img(PHOTOS.carLoading, 800, 70)}
-                alt="Vehicles being loaded for shipping"
+                src={slide.image}
+                alt={slide.heading}
                 fill
-                sizes="(max-width: 1024px) 90vw, 380px"
+                priority={index === 0}
+                sizes="100vw"
                 className="object-cover"
               />
-              <span className="absolute left-3 top-3 rounded-full bg-gold px-3 py-1 text-[11px] font-semibold text-gold-foreground">
-                Next-level freight forwarding
-              </span>
-            </div>
-            <div className="flex items-center justify-between px-2 py-3">
-              <div>
-                <p className="text-sm font-semibold text-white">
-                  RoRo &amp; Container
-                </p>
-                <p className="text-xs text-white/60">Origin to destination</p>
-              </div>
-              <div className="flex -space-x-2">
-                {[PHOTOS.carSingle, PHOTOS.truck, PHOTOS.shipRamp].map((p) => (
-                  <span
-                    key={p}
-                    className="relative size-8 overflow-hidden rounded-full border-2 border-ink/60"
-                  >
-                    <Image
-                      src={img(p, 80, 40)}
-                      alt=""
-                      fill
-                      sizes="32px"
-                      className="object-cover"
-                    />
-                  </span>
-                ))}
-              </div>
-            </div>
+            </motion.div>
           </motion.div>
-
-          {/* floating stat chip */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 1, ease }}
-            className="absolute -bottom-5 -left-4 rounded-2xl border border-white/15 bg-background/90 px-4 py-3 shadow-xl backdrop-blur"
-          >
-            <p className="font-heading text-2xl font-extrabold text-brand">42+</p>
-            <p className="text-[11px] font-medium text-muted-foreground">
-              Member countries
-            </p>
-          </motion.div>
-        </motion.div>
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-gradient-to-r from-brand/60 via-brand/30 to-ink/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-transparent to-brand/20" />
       </div>
 
-      {/* scroll cue */}
+      <div className="mx-auto w-full max-w-5xl px-5 pt-32 pb-24 sm:px-8">
+        <div className="mx-auto max-w-4xl text-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={index}
+              variants={copyContainer}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+              className="flex flex-col items-center"
+            >
+              <motion.div variants={copyItem} className="flex justify-center">
+                <Eyebrow tone="light">{slide.kicker}</Eyebrow>
+              </motion.div>
+
+              <motion.h1
+                variants={wordContainer}
+                className="mt-6 max-w-3xl font-heading text-5xl font-extrabold leading-[1.08] tracking-tight text-white text-balance sm:text-6xl lg:text-7xl"
+              >
+                {slide.heading.split(" ").map((w, i) => (
+                  <span
+                    key={`${index}-${i}`}
+                    className="mr-[0.28em] inline-block overflow-hidden pb-1 align-bottom"
+                  >
+                    <motion.span variants={word} className="inline-block">
+                      {w}
+                    </motion.span>
+                  </span>
+                ))}
+              </motion.h1>
+
+              <motion.div
+                variants={copyItem}
+                className="mt-10 flex flex-col justify-center gap-4 sm:flex-row sm:items-center"
+              >
+                <Button
+                  nativeButton={false}
+                  size="lg"
+                  className="h-12 rounded-full bg-brand px-8 text-sm font-semibold text-white hover:bg-brand/90 shadow-lg shadow-brand/20"
+                  render={<a href="#membership" />}
+                >
+                  Join Now
+                  <HugeiconsIcon icon={ArrowRight01Icon} />
+                </Button>
+                <Button
+                  nativeButton={false}
+                  size="lg"
+                  variant="outline"
+                  className="h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-md px-8 text-sm font-semibold text-white hover:bg-black/60 hover:text-white"
+                  render={<a href="#contact" />}
+                >
+                  Contact Us
+                </Button>
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Trust chip, bottom-left */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.4 }}
-        className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 sm:block"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.6, ease }}
+        className="absolute bottom-6 left-5 hidden items-center gap-3 rounded-xl border border-white/15 bg-white px-4 py-3 shadow-xl backdrop-blur-xl sm:flex sm:left-8"
       >
-        <div className="flex h-9 w-5 items-start justify-center rounded-full border border-white/30 p-1">
-          <motion.span
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-            className="size-1.5 rounded-full bg-white/80"
-          />
+        <AvatarGroup>
+          {[PHOTOS.carSingle, PHOTOS.truck, PHOTOS.shipRamp].map((p) => (
+            <Avatar key={p} className="ring-2 ring-ink/40">
+              <AvatarImage src={img(p, 80, 40)} alt="" />
+              <AvatarFallback>AL</AvatarFallback>
+            </Avatar>
+          ))}
+          <AvatarGroupCount className="ring-2 ring-ink/40">
+            +
+          </AvatarGroupCount>
+        </AvatarGroup>
+        <div>
+          <p className="text-sm text-black font-semibold">
+            {stats[1].value}
+            {stats[1].suffix} Partners
+          </p>
+          <p className="text-xs text-black/60">Trusted worldwide</p>
         </div>
       </motion.div>
+
+      {/* Next-slide preview, bottom-right */}
+      <motion.button
+        type="button"
+        onClick={() => setIndex(nextIndex)}
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.7, ease }}
+        className="group absolute bottom-6 right-5 hidden w-48 overflow-hidden rounded-2xl border border-white/15 bg-white p-2.5 text-left shadow-xl backdrop-blur-xl transition-transform hover:-translate-y-1 sm:block sm:right-8"
+        aria-label="Show next slide"
+      >
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl">
+          <Image
+            src={heroSlides[nextIndex].image}
+            alt={heroSlides[nextIndex].heading}
+            fill
+            sizes="192px"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-transparent" />
+          <span className="absolute left-2 top-2 rounded-full bg-gold px-2.5 py-1 text-[10px] font-semibold text-gold-foreground">
+            Next
+          </span>
+        </div>
+        <p className="mt-2 line-clamp-1 text-xs font-medium text-black">
+          {heroSlides[nextIndex].kicker}
+        </p>
+        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-black/10">
+          <motion.div
+            key={index}
+            initial={{ width: "0%" }}
+            animate={{ width: "100%" }}
+            transition={{ duration: AUTOPLAY_MS / 1000, ease: "linear" }}
+            className="h-full rounded-full bg-gold"
+          />
+        </div>
+      </motion.button>
+
+      {/* Slide dots */}
+      <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2 sm:hidden">
+        {heroSlides.map((s, i) => (
+          <button
+            key={s.image}
+            type="button"
+            onClick={() => setIndex(i)}
+            aria-label={`Go to slide ${i + 1}`}
+            className={`h-1.5 rounded-full transition-all ${
+              i === index ? "w-6 bg-gold" : "w-1.5 bg-white/40"
+            }`}
+          />
+        ))}
+      </div>
     </section>
   );
 }

@@ -23,14 +23,15 @@ import { cn } from "@/lib/utils";
 function QuoteButton({ className }: { className?: string }) {
   return (
     <Button
+      nativeButton={false}
       render={<a href="#contact" />}
       className={cn(
-        "group relative h-10 w-fit overflow-hidden rounded-full p-1 ps-4 pe-12 text-sm font-medium transition-all duration-500 hover:bg-primary/80 hover:ps-12 hover:pe-4",
+        "group relative h-10 w-fit overflow-hidden rounded-full p-1 ps-4 pe-12 text-sm font-medium transition-all duration-500 bg-brand text-white hover:bg-brand/80 hover:ps-12 hover:pe-4",
         className,
       )}
     >
       <span className="relative z-10">Get a Quote</span>
-      <div className="absolute right-1 flex size-8 items-center justify-center rounded-full bg-background text-foreground transition-all duration-500 group-hover:right-[calc(100%-36px)] group-hover:rotate-45">
+      <div className="absolute right-1 flex size-8 items-center justify-center rounded-full bg-white text-brand transition-all duration-500 group-hover:right-[calc(100%-36px)] group-hover:rotate-45">
         <ArrowUpRight size={16} />
       </div>
     </Button>
@@ -61,26 +62,26 @@ export function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-transparent">
-      <div className="mx-auto w-full max-w-6xl px-4 py-3 sm:px-6 sm:pt-4">
+      <div className="mx-auto w-full max-w-7xl px-4 py-3 sm:px-6 sm:pt-4 rounded-full">
         <nav
-          className={cn(
-            "flex h-fit w-full items-center justify-between gap-3.5 transition-all duration-500 lg:gap-6",
-            sticky
-              ? "rounded-full border border-border/70 bg-background/80 p-2.5 shadow-lg shadow-brand/5 backdrop-blur-xl"
-              : "border border-transparent bg-background/30 p-2.5 backdrop-blur-md",
-          )}
+          className="flex h-fit w-full items-center justify-between transition-all duration-500 relative pointer-events-auto"
         >
-          <a href="#home" aria-label="ALN home">
+          <a href="#home" aria-label="ALN home" className="flex-shrink-0 z-10 rounded-2xl bg-white px-5 py-2.5 shadow-lg shadow-brand/5 flex items-center justify-center">
             <Logo />
           </a>
 
-          <NavigationMenu className="max-lg:hidden rounded-full bg-muted p-0.5">
-            <NavigationMenuList className="flex gap-0">
-              {navLinks.map((link) => (
+          <NavigationMenu className="max-lg:hidden rounded-full bg-white p-1.5 shadow-lg shadow-brand/5 z-10 absolute left-1/2 -translate-x-1/2">
+            <NavigationMenuList className="flex gap-1.5">
+              {navLinks.map((link, i) => (
                 <NavigationMenuItem key={link.href}>
                   <NavigationMenuLink
                     href={link.href}
-                    className="rounded-full px-2 py-2 text-sm font-medium tracking-normal text-muted-foreground outline outline-transparent transition hover:bg-background hover:text-foreground hover:shadow-xs hover:outline-border lg:px-4"
+                    className={cn(
+                      "rounded-full px-6 py-2.5 text-sm font-semibold tracking-wide outline outline-transparent transition-all",
+                      i === 0
+                        ? "bg-black text-neutral-300 shadow-sm"
+                        : "text-foreground hover:bg-muted"
+                    )}
                   >
                     {link.label}
                   </NavigationMenuLink>
@@ -89,36 +90,38 @@ export function Navbar() {
             </NavigationMenuList>
           </NavigationMenu>
 
-          <QuoteButton className="hidden lg:flex" />
+          <div className="flex items-center gap-3 flex-shrink-0 z-10">
+            <QuoteButton className="hidden lg:flex shadow-lg shadow-brand/5" />
 
-          <div className="lg:hidden">
-            <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-              <DropdownMenuTrigger className="flex cursor-pointer items-center justify-center rounded-full border border-border bg-background p-2 outline-none transition-colors">
-                <TextAlignJustify size={20} />
-                <span className="sr-only">Menu</span>
-              </DropdownMenuTrigger>
+            <div className="lg:hidden">
+              <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+                <DropdownMenuTrigger className="flex cursor-pointer items-center justify-center rounded-full border border-border/70 bg-background/90 backdrop-blur-xl p-2.5 shadow-lg shadow-brand/5 outline-none transition-colors">
+                  <TextAlignJustify size={20} />
+                  <span className="sr-only">Menu</span>
+                </DropdownMenuTrigger>
 
-              <DropdownMenuContent align="end" className="mt-2 w-56">
-                {navLinks.map((link) => (
-                  <DropdownMenuItem key={link.href}>
+                <DropdownMenuContent align="end" className="mt-2 w-56">
+                  {navLinks.map((link) => (
+                    <DropdownMenuItem key={link.href}>
+                      <a
+                        href={link.href}
+                        className="w-full cursor-pointer text-sm font-medium"
+                      >
+                        {link.label}
+                      </a>
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuItem>
                     <a
-                      href={link.href}
+                      href="#contact"
                       className="w-full cursor-pointer text-sm font-medium"
                     >
-                      {link.label}
+                      Get a Quote
                     </a>
                   </DropdownMenuItem>
-                ))}
-                <DropdownMenuItem>
-                  <a
-                    href="#contact"
-                    className="w-full cursor-pointer text-sm font-medium"
-                  >
-                    Get a Quote
-                  </a>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </nav>
       </div>

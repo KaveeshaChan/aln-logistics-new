@@ -42,6 +42,24 @@ export const site = {
   address: "No 88, Level 03, Justice Akbar Mawatha, Colombo 02, Sri Lanka",
 };
 
+export const heroSlides = [
+  {
+    image: "/hero-1.jpg",
+    kicker: "Become a Member",
+    heading: "The Leading Automobile Logistics Network",
+  },
+  {
+    image: "/hero-2.jpg",
+    kicker: "Fastest Growing and Specialized",
+    heading: "Automobile Logistics Network in the World",
+  },
+  {
+    image: "/hero-3.jpg",
+    kicker: "Freight Contact Business Leads",
+    heading: "Secured Business and Maximized Profits",
+  },
+] as const;
+
 export const navLinks = [
   { label: "About", href: "#about" },
   { label: "Services", href: "#services" },
