@@ -8,7 +8,6 @@ import { Services } from "@/components/sections/services";
 import { Advantages } from "@/components/sections/advantages";
 import { Objectives } from "@/components/sections/objectives";
 import { Network } from "@/components/sections/network";
-import { Clients } from "@/components/sections/clients";
 import { Cta } from "@/components/sections/cta";
 
 export default function Home() {
@@ -24,7 +23,6 @@ export default function Home() {
         <Advantages />
         <Objectives />
         <Network />
-        <Clients />
         <Cta />
       </main>
       <Footer />

@@ -9,6 +9,8 @@ interface TextRevealProps {
   delay?: number;
   /** Emphasise these words with the gold accent colour. */
   highlight?: string[];
+  /** Override the accent class for highlighted words (default "text-gold"). */
+  highlightClassName?: string;
   as?: "h1" | "h2" | "h3" | "p" | "span";
 }
 
@@ -18,6 +20,7 @@ export function TextReveal({
   className,
   delay = 0,
   highlight = [],
+  highlightClassName = "text-gold",
   as = "h2",
 }: TextRevealProps) {
   const ref = useRef(null);
@@ -36,7 +39,9 @@ export function TextReveal({
           >
             <motion.span
               className={
-                isHighlight ? "inline-block text-gold" : "inline-block"
+                isHighlight
+                  ? `inline-block ${highlightClassName}`
+                  : "inline-block"
               }
               initial={{ y: "110%", opacity: 0 }}
               animate={inView ? { y: 0, opacity: 1 } : undefined}

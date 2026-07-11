@@ -82,6 +82,13 @@ export const services = [
     description:
       "End-to-end sea freight for brand new and used units — from single vehicles to full RoRo and container loads across every major trade lane.",
     photo: PHOTOS.shipRamp,
+    tags: [
+      "RoRo vessels",
+      "Container loads",
+      "Breakbulk",
+      "Port handling",
+      "Trade lanes",
+    ],
   },
   {
     icon: DeliveryTruck01Icon,
@@ -89,6 +96,12 @@ export const services = [
     description:
       "Specialised car-carrier fleets and multimodal rail links deliver door-to-door inland transport with real-time tracking.",
     photo: PHOTOS.truck,
+    tags: [
+      "Car carriers",
+      "Multimodal rail",
+      "Door-to-door",
+      "Live tracking",
+    ],
   },
   {
     icon: Airplane01Icon,
@@ -96,6 +109,12 @@ export const services = [
     description:
       "Time-critical automotive parts and high-value units flown worldwide with prioritised customs clearance.",
     photo: PHOTOS.containers,
+    tags: [
+      "Time-critical",
+      "High-value units",
+      "Customs priority",
+      "Worldwide",
+    ],
   },
   {
     icon: WarehouseIcon,
@@ -103,6 +122,12 @@ export const services = [
     description:
       "Secure yard storage, pre-delivery inspection and value-added handling managed by trusted local specialists.",
     photo: PHOTOS.warehouse,
+    tags: [
+      "Yard storage",
+      "Pre-delivery inspection",
+      "Value-added handling",
+      "Local specialists",
+    ],
   },
 ] as const;
 
