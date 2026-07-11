@@ -19,12 +19,12 @@ const points = [
 
 export function About() {
   return (
-    <section id="about" className="relative py-24 sm:py-28">
+    <section id="about" className="relative py-24 sm:py-28 bg-white text-black">
       <div className="mx-auto grid max-w-6xl gap-14 px-5 sm:px-8 lg:grid-cols-2 lg:items-center">
         {/* Image collage */}
         <div className="relative order-2 lg:order-1">
           <Reveal direction="right" className="relative">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] shadow-2xl shadow-brand/10">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] shadow-2xl shadow-neutral-200/50">
               <Image
                 src={img(PHOTOS.shipRamp, 900, 70)}
                 alt="Vehicles being driven onto a RoRo vessel"
@@ -40,7 +40,7 @@ export function About() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute -bottom-8 -right-2 w-44 overflow-hidden rounded-2xl border-4 border-background shadow-xl sm:w-56"
+            className="absolute -bottom-8 -right-2 w-44 overflow-hidden rounded-2xl border-4 border-white shadow-xl sm:w-56"
           >
             <div className="relative aspect-square">
               <Image
@@ -53,11 +53,11 @@ export function About() {
             </div>
           </motion.div>
 
-          <div className="absolute -left-3 top-6 rounded-2xl border border-border bg-card px-4 py-3 shadow-lg">
+          <div className="absolute -left-3 top-6 rounded-2xl border border-neutral-200 bg-white px-4 py-3 shadow-lg">
             <p className="font-heading text-2xl font-extrabold text-brand">
               15K+
             </p>
-            <p className="text-xs text-muted-foreground">Vehicles moved / year</p>
+            <p className="text-xs text-neutral-500 font-medium">Vehicles moved / year</p>
           </div>
         </div>
 
@@ -71,11 +71,11 @@ export function About() {
             as="h2"
             text="Handpicked partners for the automobile logistics industry"
             highlight={["Handpicked", "automobile"]}
-            className="mt-5 font-heading text-3xl font-extrabold leading-tight tracking-tight text-foreground text-balance sm:text-4xl"
+            className="mt-5 font-heading text-3xl font-extrabold leading-tight tracking-tight text-neutral-900 text-balance sm:text-4xl"
           />
 
           <Reveal delay={0.1}>
-            <p className="mt-5 text-base leading-relaxed text-muted-foreground">
+            <p className="mt-5 text-base leading-relaxed text-neutral-600">
               The Automobile Logistics Network membership consists of qualified,
               experienced freight forwarders and logistics providers in each
               major country that exports and imports automobiles. They cooperate
@@ -91,7 +91,7 @@ export function About() {
                   <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-brand/10 text-brand">
                     <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} />
                   </span>
-                  <span className="text-[15px] leading-relaxed text-foreground/90">
+                  <span className="text-[15px] leading-relaxed text-neutral-800">
                     {point}
                   </span>
                 </div>

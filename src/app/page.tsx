@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Hero } from "@/components/sections/hero";
+import { LogoCloud } from "@/components/sections/logo-cloud";
 import { Stats } from "@/components/sections/stats";
 import { About } from "@/components/sections/about";
 import { Services } from "@/components/sections/services";
@@ -16,6 +17,7 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         <Hero />
+        <LogoCloud />
         <Stats />
         <About />
         <Services />
