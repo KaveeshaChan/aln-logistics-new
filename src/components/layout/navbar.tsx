@@ -79,8 +79,8 @@ export function Navbar() {
                     className={cn(
                       "rounded-full px-6 py-2.5 text-sm font-semibold tracking-wide outline outline-transparent transition-all",
                       i === 0
-                        ? "bg-black text-neutral-300 shadow-sm"
-                        : "text-foreground hover:bg-muted"
+                        ? "bg-black text-white shadow-sm"
+                        : "text-black hover:bg-black/5"
                     )}
                   >
                     {link.label}
