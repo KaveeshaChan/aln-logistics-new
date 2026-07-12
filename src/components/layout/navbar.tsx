@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowUpRight } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 
@@ -21,7 +22,7 @@ function QuoteButton({ className }: { className?: string }) {
   return (
     <Button
       nativeButton={false}
-      render={<a href="#contact" />}
+      render={<a href="/quote" />}
       className={cn(
         "group relative h-10 w-fit overflow-hidden rounded-full p-1 ps-4 pe-12 text-sm font-medium transition-all duration-500 bg-brand text-white hover:bg-brand/80 hover:ps-12 hover:pe-4",
         className,
@@ -162,7 +163,7 @@ function MobileMenu({
 
             <motion.div variants={menuItem} className="mt-6">
               <a
-                href="#contact"
+                href="/quote"
                 onClick={onClose}
                 className="flex h-13 items-center justify-center gap-2 rounded-full bg-brand py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand/25 transition-transform duration-300 active:scale-[0.98]"
               >
@@ -202,23 +203,34 @@ export function Navbar() {
     return () => window.removeEventListener("resize", handleResize);
   }, [handleResize]);
 
-  // Scroll spy — highlight the nav link of the section currently in view
+  const pathname = usePathname();
+
+  // Scroll spy — highlight the nav link of the section currently in view.
+  // Only hash links pointing at sections on the current page are observed.
   useEffect(() => {
-    const sections = navLinks
-      .map((link) => document.querySelector(link.href))
-      .filter((el): el is Element => el !== null);
+    setActive(null);
+
+    const targets = navLinks
+      .map((link) => {
+        const hashIndex = link.href.indexOf("#");
+        if (hashIndex === -1) return null;
+        const el = document.querySelector(link.href.slice(hashIndex));
+        return el ? { href: link.href as string, el } : null;
+      })
+      .filter((t): t is { href: string; el: Element } => t !== null);
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) setActive(`#${entry.target.id}`);
+          if (!entry.isIntersecting) continue;
+          const match = targets.find((t) => t.el === entry.target);
+          if (match) setActive(match.href);
         }
       },
       // A thin band around the middle of the viewport decides the active section
       { rootMargin: "-40% 0px -55% 0px", threshold: 0 },
     );
-
-    sections.forEach((el) => observer.observe(el));
+    targets.forEach((t) => observer.observe(t.el));
 
     // Clear the highlight when scrolled back up to the hero
     const hero = document.querySelector("#home");
@@ -234,7 +246,7 @@ export function Navbar() {
       observer.disconnect();
       heroObserver.disconnect();
     };
-  }, []);
+  }, [pathname]);
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-transparent">
@@ -242,14 +254,17 @@ export function Navbar() {
         <nav
           className="flex h-fit w-full items-center justify-between transition-all duration-500 relative pointer-events-auto"
         >
-          <a href="#home" aria-label="ALN home" className="flex-shrink-0 z-[60] rounded-2xl bg-white px-5 py-2.5 shadow-lg shadow-brand/5 flex items-center justify-center">
+          <a href="/" aria-label="ALN home" className="flex-shrink-0 z-[60] rounded-2xl bg-white px-5 py-2.5 shadow-lg shadow-brand/5 flex items-center justify-center">
             <Logo />
           </a>
 
           <NavigationMenu className="max-lg:hidden rounded-full bg-white p-1.5 shadow-lg shadow-brand/5 z-10 absolute left-1/2 -translate-x-1/2">
             <NavigationMenuList className="flex gap-1.5">
               {navLinks.map((link) => {
-                const isActive = active === link.href;
+                const isActive =
+                  link.href.startsWith("/") && !link.href.includes("#")
+                    ? pathname === link.href
+                    : active === link.href;
                 return (
                   <NavigationMenuItem key={link.href}>
                     <NavigationMenuLink
