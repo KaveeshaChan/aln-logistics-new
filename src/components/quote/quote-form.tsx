@@ -168,10 +168,44 @@ const stepVariants = {
   exit: (dir: number) => ({ opacity: 0, x: dir * -56 }),
 };
 
+const initialFields = {
+  startCountry: "",
+  endCountry: "",
+  startCity: "",
+  endCity: "",
+  vehicleType: "",
+  model: "",
+  year: "",
+  quantity: "",
+  length: "",
+  width: "",
+  height: "",
+  weight: "",
+  pickupAddress: "",
+  deliveryAddress: "",
+  insuranceValue: "",
+  remarks: "",
+  companyName: "",
+  companyLocation: "",
+  contactPerson: "",
+  contactNo: "",
+  companyEmail: "",
+};
+
+type Fields = typeof initialFields;
+
 export function QuoteForm() {
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+
+  // Free-text fields, lifted so values survive step changes (each step
+  // unmounts the previous one inside AnimatePresence).
+  const [fields, setFields] = useState<Fields>(initialFields);
+  const setField = (key: keyof Fields) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setFields((f) => ({ ...f, [key]: e.target.value }));
 
   // Single-choice selections (step 2)
   const [transportMode, setTransportMode] = useState("");
@@ -187,7 +221,7 @@ export function QuoteForm() {
     setChoiceError(false);
   };
 
-  const handleStepSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleStepSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (step === 1) {
       // Pill groups aren't native inputs — validate them explicitly
@@ -198,8 +232,32 @@ export function QuoteForm() {
     }
     if (step < steps.length - 1) {
       goTo(step + 1);
-    } else {
+      return;
+    }
+
+    setSubmitError("");
+    setSubmitting(true);
+    try {
+      const res = await fetch("/send-quote.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...fields,
+          transportMode,
+          fuelType,
+          condition,
+          doorToDoor,
+          marineInsurance,
+        }),
+      });
+      if (!res.ok) throw new Error("request-failed");
       setSubmitted(true);
+    } catch {
+      setSubmitError(
+        `Something went wrong sending your request. Please email us directly at ${site.email}.`,
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -260,16 +318,40 @@ export function QuoteForm() {
                   {step === 0 && (
                     <div className="grid gap-5 sm:grid-cols-2">
                       <Field label="Start location (country)" required>
-                        <input required placeholder="e.g. Japan" className={inputStyles} />
+                        <input
+                          required
+                          placeholder="e.g. Japan"
+                          className={inputStyles}
+                          value={fields.startCountry}
+                          onChange={setField("startCountry")}
+                        />
                       </Field>
                       <Field label="End location (country)" required>
-                        <input required placeholder="e.g. Sri Lanka" className={inputStyles} />
+                        <input
+                          required
+                          placeholder="e.g. Sri Lanka"
+                          className={inputStyles}
+                          value={fields.endCountry}
+                          onChange={setField("endCountry")}
+                        />
                       </Field>
                       <Field label="City (start)" required>
-                        <input required placeholder="Enter start city name" className={inputStyles} />
+                        <input
+                          required
+                          placeholder="Enter start city name"
+                          className={inputStyles}
+                          value={fields.startCity}
+                          onChange={setField("startCity")}
+                        />
                       </Field>
                       <Field label="City (end)" required>
-                        <input required placeholder="Enter end city name" className={inputStyles} />
+                        <input
+                          required
+                          placeholder="Enter end city name"
+                          className={inputStyles}
+                          value={fields.endCity}
+                          onChange={setField("endCity")}
+                        />
                       </Field>
                     </div>
                   )}
@@ -278,10 +360,22 @@ export function QuoteForm() {
                     <div className="flex flex-col gap-6">
                       <div className="grid gap-5 sm:grid-cols-2">
                         <Field label="Vehicle type" required>
-                          <input required placeholder="e.g. SUV, sedan, excavator" className={inputStyles} />
+                          <input
+                            required
+                            placeholder="e.g. SUV, sedan, excavator"
+                            className={inputStyles}
+                            value={fields.vehicleType}
+                            onChange={setField("vehicleType")}
+                          />
                         </Field>
                         <Field label="Model" required>
-                          <input required placeholder="e.g. Toyota Land Cruiser" className={inputStyles} />
+                          <input
+                            required
+                            placeholder="e.g. Toyota Land Cruiser"
+                            className={inputStyles}
+                            value={fields.model}
+                            onChange={setField("model")}
+                          />
                         </Field>
                         <Field label="Manufactured year" required>
                           <input
@@ -291,10 +385,20 @@ export function QuoteForm() {
                             max={2100}
                             placeholder="e.g. 2022"
                             className={inputStyles}
+                            value={fields.year}
+                            onChange={setField("year")}
                           />
                         </Field>
                         <Field label="Number of vehicles" required>
-                          <input required type="number" min={1} placeholder="e.g. 1" className={inputStyles} />
+                          <input
+                            required
+                            type="number"
+                            min={1}
+                            placeholder="e.g. 1"
+                            className={inputStyles}
+                            value={fields.quantity}
+                            onChange={setField("quantity")}
+                          />
                         </Field>
                       </div>
 
@@ -328,8 +432,21 @@ export function QuoteForm() {
                           Dimensions
                         </span>
                         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                          {["Length", "Width", "Height", "Weight"].map((d) => (
-                            <input key={d} placeholder={d} className={inputStyles} />
+                          {(
+                            [
+                              { key: "length", label: "Length" },
+                              { key: "width", label: "Width" },
+                              { key: "height", label: "Height" },
+                              { key: "weight", label: "Weight" },
+                            ] as const
+                          ).map((d) => (
+                            <input
+                              key={d.key}
+                              placeholder={d.label}
+                              className={inputStyles}
+                              value={fields[d.key]}
+                              onChange={setField(d.key)}
+                            />
                           ))}
                         </div>
                       </div>
@@ -364,10 +481,22 @@ export function QuoteForm() {
                           >
                             <div className="grid gap-5 sm:grid-cols-2">
                               <Field label="Pickup address" required>
-                                <input required placeholder="Pickup address" className={inputStyles} />
+                                <input
+                                  required
+                                  placeholder="Pickup address"
+                                  className={inputStyles}
+                                  value={fields.pickupAddress}
+                                  onChange={setField("pickupAddress")}
+                                />
                               </Field>
                               <Field label="Delivery address" required>
-                                <input required placeholder="Delivery address" className={inputStyles} />
+                                <input
+                                  required
+                                  placeholder="Delivery address"
+                                  className={inputStyles}
+                                  value={fields.deliveryAddress}
+                                  onChange={setField("deliveryAddress")}
+                                />
                               </Field>
                             </div>
                           </motion.div>
@@ -388,6 +517,8 @@ export function QuoteForm() {
                                 min={0}
                                 placeholder="What is the C & F value of the vehicle in USD"
                                 className={inputStyles}
+                                value={fields.insuranceValue}
+                                onChange={setField("insuranceValue")}
                               />
                             </Field>
                           </motion.div>
@@ -399,6 +530,8 @@ export function QuoteForm() {
                           rows={3}
                           placeholder="Special instructions and remarks"
                           className={cn(inputStyles, "resize-none")}
+                          value={fields.remarks}
+                          onChange={setField("remarks")}
                         />
                       </Field>
 
@@ -420,19 +553,51 @@ export function QuoteForm() {
                   {step === 2 && (
                     <div className="grid gap-5 sm:grid-cols-2">
                       <Field label="Company name" required className="sm:col-span-2">
-                        <input required placeholder="Company name" className={inputStyles} />
+                        <input
+                          required
+                          placeholder="Company name"
+                          className={inputStyles}
+                          value={fields.companyName}
+                          onChange={setField("companyName")}
+                        />
                       </Field>
                       <Field label="City / country / region" required>
-                        <input required placeholder="City/Country/Region" className={inputStyles} />
+                        <input
+                          required
+                          placeholder="City/Country/Region"
+                          className={inputStyles}
+                          value={fields.companyLocation}
+                          onChange={setField("companyLocation")}
+                        />
                       </Field>
                       <Field label="Contact person" required>
-                        <input required placeholder="Name of the contact person" className={inputStyles} />
+                        <input
+                          required
+                          placeholder="Name of the contact person"
+                          className={inputStyles}
+                          value={fields.contactPerson}
+                          onChange={setField("contactPerson")}
+                        />
                       </Field>
                       <Field label="Contact no" required>
-                        <input required type="tel" placeholder="Contact no" className={inputStyles} />
+                        <input
+                          required
+                          type="tel"
+                          placeholder="Contact no"
+                          className={inputStyles}
+                          value={fields.contactNo}
+                          onChange={setField("contactNo")}
+                        />
                       </Field>
                       <Field label="Company email" required>
-                        <input required type="email" placeholder="Company email" className={inputStyles} />
+                        <input
+                          required
+                          type="email"
+                          placeholder="Company email"
+                          className={inputStyles}
+                          value={fields.companyEmail}
+                          onChange={setField("companyEmail")}
+                        />
                       </Field>
                     </div>
                   )}
@@ -462,17 +627,35 @@ export function QuoteForm() {
 
               <motion.button
                 type="submit"
-                whileHover={{ scale: 1.03, y: -2 }}
-                whileTap={{ scale: 0.97 }}
+                disabled={submitting}
+                whileHover={submitting ? undefined : { scale: 1.03, y: -2 }}
+                whileTap={submitting ? undefined : { scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 320, damping: 20 }}
-                className="group flex h-12 cursor-pointer items-center gap-2 rounded-full bg-brand px-8 text-sm font-semibold text-white shadow-lg shadow-brand/20 transition-shadow duration-300 hover:shadow-xl hover:shadow-brand/30"
+                className="group flex h-12 cursor-pointer items-center gap-2 rounded-full bg-brand px-8 text-sm font-semibold text-white shadow-lg shadow-brand/20 transition-shadow duration-300 hover:shadow-xl hover:shadow-brand/30 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {step === steps.length - 1 ? "Submit request" : "Next step"}
+                {submitting
+                  ? "Sending..."
+                  : step === steps.length - 1
+                    ? "Submit request"
+                    : "Next step"}
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
                   <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
                 </span>
               </motion.button>
             </div>
+
+            <AnimatePresence>
+              {submitError && (
+                <motion.p
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="mt-4 text-sm font-medium text-brand"
+                >
+                  {submitError}
+                </motion.p>
+              )}
+            </AnimatePresence>
           </form>
         </div>
       )}

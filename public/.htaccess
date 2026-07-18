@@ -1,0 +1,5 @@
+# Next's static export writes out/404.html — point Apache at it.
+ErrorDocument 404 /404.html
+
+# Don't expose directory listings for folders without an index.html.
+Options -Indexes
