@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Reveal } from "@/components/motion/reveal";
 import { TextReveal } from "@/components/motion/text-reveal";
 import { AuthShell } from "@/components/auth/auth-panel";
 import { Field, PasswordField, inputStyles } from "@/components/auth/form-field";
+import { useAuth } from "@/lib/auth-context";
 
 export function LoginHeader() {
   return (
@@ -45,8 +46,24 @@ export function LoginHeader() {
 }
 
 export function LoginForm() {
+  const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setSubmitting(true);
+    const result = await login(username, password);
+    setSubmitting(false);
+    if (result.ok) {
+      window.location.href = "/account/";
+    } else {
+      setError(result.error);
+    }
+  };
 
   return (
     <AuthShell>
@@ -57,10 +74,7 @@ export function LoginForm() {
         Enter your ALN member credentials.
       </p>
 
-      <form
-        onSubmit={(e) => e.preventDefault()}
-        className="mt-8 flex flex-col gap-5"
-      >
+      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5">
         <Field label="Username" required>
           <input
             required
@@ -88,14 +102,28 @@ export function LoginForm() {
           </button>
         </div>
 
+        <AnimatePresence>
+          {error && (
+            <motion.p
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="-mt-2 text-sm font-medium text-brand"
+            >
+              {error}
+            </motion.p>
+          )}
+        </AnimatePresence>
+
         <motion.button
           type="submit"
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98 }}
+          disabled={submitting}
+          whileHover={submitting ? undefined : { scale: 1.02, y: -2 }}
+          whileTap={submitting ? undefined : { scale: 0.98 }}
           transition={{ type: "spring", stiffness: 320, damping: 20 }}
-          className="group mt-2 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-brand text-sm font-semibold text-white shadow-lg shadow-brand/20 transition-shadow duration-300 hover:shadow-xl hover:shadow-brand/30"
+          className="group mt-2 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-brand text-sm font-semibold text-white shadow-lg shadow-brand/20 transition-shadow duration-300 hover:shadow-xl hover:shadow-brand/30 disabled:cursor-not-allowed disabled:opacity-70"
         >
-          Login
+          {submitting ? "Signing in..." : "Login"}
           <span className="transition-transform duration-300 group-hover:translate-x-1">
             <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
           </span>

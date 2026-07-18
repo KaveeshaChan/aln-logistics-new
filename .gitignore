@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# real MySQL credentials — copy public/api/config.example.php to make this
+public/api/config.php
+
 # vercel
 .vercel
 
