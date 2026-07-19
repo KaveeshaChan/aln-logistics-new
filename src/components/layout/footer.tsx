@@ -90,7 +90,7 @@ export function Footer() {
         className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[42rem] -translate-x-1/2 rounded-full bg-brand/25 blur-[120px]"
       />
 
-      <div className="relative mx-auto max-w-7xl px-5 pb-10 pt-16 sm:px-8">
+      <div className="relative mx-auto max-w-8xl px-5 pb-10 pt-16 sm:px-8">
         {/* Newsletter band */}
         <Reveal>
           <div className="flex flex-col items-start justify-between gap-8 rounded-[2rem] border border-white/10 bg-white/[0.04] p-8 backdrop-blur lg:flex-row lg:items-center sm:p-10">
@@ -188,12 +188,12 @@ export function Footer() {
           </motion.p>
         </div>
 
-        <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-center text-xs text-white/50 sm:flex-row sm:text-left">
+        <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-center text-md text-white/50 sm:flex-row sm:text-left">
           <p>
             © {new Date().getFullYear()} {site.fullName}. All rights reserved.
           </p>
           <div className="flex items-center gap-5">
-            <p>Concept, design &amp; development — reimagined interface.</p>
+            <p>Concept, design &amp; development — Sha Web Design</p>
             <motion.a
               href="#home"
               aria-label="Back to top"

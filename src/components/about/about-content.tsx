@@ -180,11 +180,11 @@ export function AboutStory() {
                     sizes="(max-width: 1024px) 90vw, 560px"
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
-                  <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-full" />
+                  {/* <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-full" />
                   <span className="absolute left-5 top-5 rounded-full bg-white/90 px-3.5 py-1.5 font-heading text-xs font-bold tabular-nums text-neutral-900 backdrop-blur">
                     {String(i + 1).padStart(2, "0")} /{" "}
                     {String(story.length).padStart(2, "0")}
-                  </span>
+                  </span> */}
                 </div>
               </Reveal>
             </div>

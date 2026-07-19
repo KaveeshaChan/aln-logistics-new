@@ -66,7 +66,7 @@ export const navLinks = [
   { label: "Network", href: "/#network" },
   { label: "Membership", href: "/membership" },
   { label: "Member Directory", href: "/login" },
-  { label: "Contact", href: "#contact" },
+  { label: "Contact", href: "/contact" },
 ] as const;
 
 export const stats = [
@@ -204,9 +204,9 @@ export const footerLinks = {
   ],
   Support: [
     { label: "Join Us", href: "#membership" },
-    { label: "Service & Quote", href: "#contact" },
+    { label: "Service & Quote", href: "/quote" },
     { label: "Gallery", href: "#network" },
-    { label: "Contact Us", href: "#contact" },
+    { label: "Contact Us", href: "/contact" },
   ],
 } as const;
 

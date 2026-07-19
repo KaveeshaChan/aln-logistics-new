@@ -104,7 +104,7 @@ export function Cta() {
                   nativeButton={false}
                   size="lg"
                   className="group h-12 rounded-full bg-white px-8 text-sm font-semibold text-brand shadow-lg shadow-black/10 transition-shadow duration-300 hover:bg-white hover:shadow-xl hover:shadow-black/15"
-                  render={<a href={`mailto:${site.email}`} />}
+                  render={<a href="/contact" />}
                 >
                   Apply for Membership
                   <span className="transition-transform duration-300 group-hover:translate-x-1">

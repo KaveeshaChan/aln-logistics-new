@@ -208,7 +208,7 @@ export function MembershipFee() {
                   nativeButton={false}
                   size="lg"
                   className="group h-12 w-full rounded-full bg-white px-8 text-sm font-semibold text-brand hover:bg-white shadow-lg shadow-black/10"
-                  render={<a href="mailto:admin@autologisticsnetwork.com" />}
+                  render={<a href="/contact" />}
                 >
                   Apply to represent your country
                   <span className="transition-transform duration-300 group-hover:translate-x-1">
