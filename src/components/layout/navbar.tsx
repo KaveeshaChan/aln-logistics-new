@@ -250,7 +250,7 @@ export function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-transparent">
-      <div className="mx-auto w-full max-w-7xl px-4 py-3 sm:px-6 sm:pt-4 rounded-full">
+      <div className="mx-auto w-full max-w-8xl px-4 py-3 sm:px-6 sm:pt-4 rounded-full">
         <nav
           className="flex h-fit w-full items-center justify-between transition-all duration-500 relative pointer-events-auto"
         >

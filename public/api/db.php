@@ -23,9 +23,22 @@ function aln_db(): PDO {
         );
     }
 
-    /** @var array{host:string,dbname:string,user:string,pass:string} $config */
     $config = require $configPath;
 
+    // config.php must `return [...]` (see config.example.php) — a common
+    // mistake is writing `define("DB_HOST", ...)` style constants instead,
+    // which makes `require` return 1 here instead of an array.
+    if (
+        !is_array($config)
+        || !isset($config["host"], $config["dbname"], $config["user"], $config["pass"])
+    ) {
+        aln_json_error(
+            500,
+            "public/api/config.php must `return` an array with host, dbname, user, pass keys — see config.example.php.",
+        );
+    }
+
+    /** @var array{host:string,dbname:string,user:string,pass:string} $config */
     $dsn = "mysql:host={$config['host']};dbname={$config['dbname']};charset=utf8mb4";
 
     try {
