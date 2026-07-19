@@ -204,6 +204,12 @@ export function Navbar() {
   }, [handleResize]);
 
   const pathname = usePathname();
+  // Static export serves pages with a trailing slash (e.g. "/contact/"),
+  // so strip it before comparing against nav link hrefs.
+  const currentPath =
+    pathname.length > 1 && pathname.endsWith("/")
+      ? pathname.slice(0, -1)
+      : pathname;
 
   // Scroll spy — highlight the nav link of the section currently in view.
   // Only hash links pointing at sections on the current page are observed.
@@ -263,7 +269,7 @@ export function Navbar() {
               {navLinks.map((link) => {
                 const isActive =
                   link.href.startsWith("/") && !link.href.includes("#")
-                    ? pathname === link.href
+                    ? currentPath === link.href
                     : active === link.href;
                 return (
                   <NavigationMenuItem key={link.href}>

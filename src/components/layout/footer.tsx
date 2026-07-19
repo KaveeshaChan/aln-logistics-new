@@ -90,6 +90,22 @@ export function Footer() {
         className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[42rem] -translate-x-1/2 rounded-full bg-brand/25 blur-[120px]"
       />
 
+      {/* Giant ALN watermark layered behind the footer content */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 flex select-none items-center justify-center overflow-hidden"
+      >
+        <motion.p
+          initial={{ opacity: 0, y: 80, scale: 0.96 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 1.2, ease }}
+          className="bg-gradient-to-b from-white/[0.06] to-white/[0.01] bg-clip-text text-center font-heading text-[28vw] font-extrabold leading-none tracking-tight text-transparent lg:text-[24rem]"
+        >
+          ALN
+        </motion.p>
+      </div>
+
       <div className="relative mx-auto max-w-8xl px-5 pb-10 pt-16 sm:px-8">
         {/* Newsletter band */}
         <Reveal>
@@ -172,28 +188,45 @@ export function Footer() {
           </div>
         </Reveal>
 
-        {/* Giant watermark */}
-        <div
-          aria-hidden
-          className="pointer-events-none mt-12 select-none overflow-hidden"
-        >
-          <motion.p
-            initial={{ y: 60, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.9, ease }}
-            className="bg-gradient-to-b from-white/[0.09] to-white/[0.01] bg-clip-text text-center font-heading text-[22vw] font-extrabold leading-[0.85] tracking-tight text-transparent lg:text-[19rem]"
-          >
-            ALN
-          </motion.p>
-        </div>
-
-        <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-center text-md text-white/50 sm:flex-row sm:text-left">
+        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-center text-md text-white/50 sm:flex-row sm:text-left">
           <p>
             © {new Date().getFullYear()} {site.fullName}. All rights reserved.
           </p>
           <div className="flex items-center gap-5">
-            <p>Concept, design &amp; development — Sha Web Design</p>
+            <p className="flex items-baseline gap-1.5">
+              Crafted by{" "}
+              <motion.a
+                href="https://shawebdesign.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Sha Web Design — concept, design and development"
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 320, damping: 20 }}
+                className="group/credit relative inline-block"
+              >
+                <span
+                  aria-hidden
+                  className="absolute -inset-x-3 -inset-y-1.5 rounded-full bg-gold/15 opacity-0 blur-lg transition-opacity duration-500 group-hover/credit:opacity-100"
+                />
+                <motion.span
+                  animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(110deg, var(--gold) 35%, #ffffff 50%, var(--gold) 65%)",
+                    backgroundSize: "200% 100%",
+                  }}
+                  className="relative bg-clip-text font-heading text-base font-bold tracking-tight text-transparent"
+                >
+                  Sha Web Design
+                </motion.span>
+                <span
+                  aria-hidden
+                  className="absolute -bottom-0.5 left-0 block h-px w-0 rounded-full bg-gold transition-all duration-500 group-hover/credit:w-full"
+                />
+              </motion.a>
+            </p>
             <motion.a
               href="#home"
               aria-label="Back to top"
