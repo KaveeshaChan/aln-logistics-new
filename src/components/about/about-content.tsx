@@ -1,9 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import {
+  ArrowRight01Icon,
+  VolumeHighIcon,
+  VolumeMuteIcon,
+} from "@hugeicons/core-free-icons";
 import { motion, useScroll, useTransform } from "motion/react";
 
 import { Eyebrow } from "@/components/ui/eyebrow";
@@ -13,6 +17,122 @@ import { TextReveal } from "@/components/motion/text-reveal";
 import { img, objectives, PHOTOS, stats } from "@/lib/site";
 
 const ease = [0.22, 1, 0.36, 1] as const;
+
+const CONFERENCE_VIDEO_ID = "nFj26B8jyJM";
+
+/* ------------------------------------------------------------------ */
+/* Intro — welcome title, conference video, mission copy               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Autoplays on every browser without a click — Chrome, Safari and Firefox
+ * only allow unprompted autoplay when the media starts muted.
+ */
+function ConferenceVideo() {
+  const [muted, setMuted] = useState(true);
+
+  return (
+    <div className="relative aspect-video w-full overflow-hidden rounded-[2rem] bg-neutral-900 shadow-2xl shadow-neutral-200/70">
+      <iframe
+        key={muted ? "muted" : "unmuted"}
+        src={`https://www.youtube-nocookie.com/embed/${CONFERENCE_VIDEO_ID}?autoplay=1&mute=${muted ? 1 : 0}&loop=1&playlist=${CONFERENCE_VIDEO_ID}&controls=1&playsinline=1`}
+        title="Welcome to Automobile Logistics Network"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className="absolute inset-0 size-full"
+      />
+      <button
+        type="button"
+        onClick={() => setMuted((m) => !m)}
+        aria-label={muted ? "Unmute video" : "Mute video"}
+        className="absolute bottom-4 right-4 grid size-10 cursor-pointer place-items-center rounded-full bg-black/60 text-white backdrop-blur transition-colors duration-300 hover:bg-black/80"
+      >
+        <HugeiconsIcon icon={muted ? VolumeMuteIcon : VolumeHighIcon} size={18} />
+      </button>
+    </div>
+  );
+}
+
+const intro = [
+  {
+    heading: "Qualified Specialists in every market",
+    paragraphs: [
+      "The Automobile Logistics Network (ALN) membership consists of handpicked freight forwarders and logistics providers in each major country that exports and imports automobiles. They cooperate with each other to develop business opportunities among themselves in the automobile logistics industry.",
+      "ALN members are qualified and experienced in providing end-to-end logistics solutions for international and domestic automobile transportation — at a low cost with a high return, while being mutually beneficial.",
+      "ALN's policy is to have one member from each country, equipped with knowledge of local and international policies, procedures and regulations for the export and import of automobiles.",
+    ],
+    note: "ALN follows a selective membership model, carefully appointing a limited number of qualified companies in each country. This approach promotes stronger cooperation, meaningful business opportunities, and high-quality representation across the global automobile logistics industry.",
+  },
+  {
+    heading: "A trade few forwarders master",
+    paragraphs: [
+      "Members hold contacts with manufacturers, exporters, importers, carriers, government and non-government institutions — everything needed to provide complete logistics services for the industry. Automobile logistics is a specialised sector where few providers are involved.",
+      "It is, however, a high-revenue and profit-generating business due to the nature of its logistics complexity. Our members are strengthened by sharing operational and marketing hints, market sizes and available opportunities in their respective countries.",
+    ],
+    note: null,
+  },
+] as const;
+
+export function AboutIntro() {
+  return (
+    <section className="bg-white pb-20 pt-36 text-black sm:pb-24 sm:pt-44">
+      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+        <Reveal className="flex items-center gap-2 text-xs font-medium text-neutral-400">
+          <a href="/" className="transition-colors hover:text-brand">
+            Home
+          </a>
+          <span>/</span>
+          <span className="text-neutral-700">About</span>
+        </Reveal>
+
+        <Reveal delay={0.05} className="mx-auto mt-8 max-w-4xl">
+          <ConferenceVideo />
+        </Reveal>
+
+        <div className="mx-auto mt-10 max-w-3xl text-center">
+          <TextReveal
+            as="h2"
+            text="Welcome to Automobile Logistics Network"
+            highlight={["Automobile", "Logistics", "Network"]}
+            className="font-heading text-3xl font-extrabold leading-tight tracking-tight text-neutral-900 text-balance sm:text-4xl"
+          />
+        </div>
+
+        <Reveal delay={0.1} className="mx-auto mt-6 max-w-3xl text-center">
+          <Eyebrow>Global network for trusted automobile partners</Eyebrow>
+        </Reveal>
+
+        <div className="mx-auto mt-14 flex max-w-4xl flex-col gap-14">
+          {intro.map((block) => (
+            <div key={block.heading}>
+              <TextReveal
+                as="h3"
+                text={block.heading}
+                className="font-heading text-2xl font-bold tracking-tight text-neutral-900 text-balance sm:text-3xl"
+              />
+              <div className="mt-5 space-y-4">
+                {block.paragraphs.map((p, j) => (
+                  <Reveal key={j} delay={0.05 + j * 0.08}>
+                    <p className="text-base leading-relaxed text-neutral-600">
+                      {p}
+                    </p>
+                  </Reveal>
+                ))}
+              </div>
+              {block.note && (
+                <Reveal delay={0.2}>
+                  <p className="mt-5 rounded-2xl border border-brand/15 bg-brand/[0.04] p-5 text-sm leading-relaxed text-neutral-600">
+                    {block.note}
+                  </p>
+                </Reveal>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 /* ------------------------------------------------------------------ */
 /* Page header + parallax banner                                       */
@@ -27,17 +147,9 @@ export function AboutHeader() {
   const imageY = useTransform(scrollYProgress, [0, 1], ["-12%", "12%"]);
 
   return (
-    <section className="bg-white pt-36 text-black sm:pt-44">
+    <section className="bg-white pt-4 text-black sm:pt-6">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <Reveal className="flex items-center gap-2 text-xs font-medium text-neutral-400">
-          <a href="/" className="transition-colors hover:text-brand">
-            Home
-          </a>
-          <span>/</span>
-          <span className="text-neutral-700">About</span>
-        </Reveal>
-
-        <div className="mt-6 max-w-3xl">
+        <div className="max-w-3xl">
           <Reveal delay={0.05}>
             <Eyebrow>Who we are</Eyebrow>
           </Reveal>
@@ -103,27 +215,6 @@ export function AboutHeader() {
 /* ------------------------------------------------------------------ */
 
 const story = [
-  {
-    eyebrow: "The membership",
-    heading: "Qualified specialists in every market",
-    photo: PHOTOS.shipRamp,
-    alt: "Vehicles driven onto a RoRo vessel",
-    paragraphs: [
-      "The Automobile Logistics Network (ALN) membership consists of handpicked freight forwarders and logistics providers in each major country that exports and imports automobiles. They cooperate with each other to develop business opportunities among themselves in the automobile logistics industry.",
-      "ALN members are qualified and experienced in providing end-to-end logistics solutions for international and domestic automobile transportation — at a low cost with a high return, while being mutually beneficial.",
-      "ALN's policy is to have one member from each country, equipped with knowledge of local and international policies, procedures and regulations for the export and import of automobiles.",
-    ],
-  },
-  {
-    eyebrow: "The specialty",
-    heading: "A trade few forwarders master",
-    photo: PHOTOS.carLoading,
-    alt: "Cars being loaded for transport",
-    paragraphs: [
-      "Members hold contacts with manufacturers, exporters, importers, carriers, government and non-government institutions — everything needed to provide complete logistics services for the industry. Automobile logistics is a specialised sector where few providers are involved.",
-      "It is, however, a high-revenue and profit-generating business due to the nature of its logistics complexity. Our members are strengthened by sharing operational and marketing hints, market sizes and available opportunities in their respective countries.",
-    ],
-  },
   {
     eyebrow: "The invitation",
     heading: "A global network, open to the right partner",

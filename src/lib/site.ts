@@ -61,12 +61,13 @@ export const heroSlides = [
 ] as const;
 
 export const navLinks = [
+  { label: "Home", href: "/" },
   { label: "About", href: "/about" },
-  { label: "Services", href: "/services" },
-  { label: "Network", href: "/#network" },
-  { label: "Membership", href: "/membership" },
   { label: "Member Directory", href: "/login" },
-  { label: "Contact", href: "/contact" },
+  { label: "Benefits", href: "/benefits" },
+  { label: "Conference", href: "/conference" },
+  { label: "Gallery", href: "/gallery" },
+  { label: "Contact us", href: "/contact" },
 ] as const;
 
 export const stats = [

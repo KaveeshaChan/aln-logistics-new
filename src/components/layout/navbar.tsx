@@ -22,13 +22,13 @@ function QuoteButton({ className }: { className?: string }) {
   return (
     <Button
       nativeButton={false}
-      render={<a href="/quote" />}
+      render={<a href="/membership" />}
       className={cn(
         "group relative h-10 w-fit overflow-hidden rounded-full p-1 ps-4 pe-12 text-sm font-medium transition-all duration-500 bg-brand text-white hover:bg-brand/80 hover:ps-12 hover:pe-4",
         className,
       )}
     >
-      <span className="relative z-10">Get a Quote</span>
+      <span className="relative z-10">Become a Member</span>
       <div className="absolute right-1 flex size-8 items-center justify-center rounded-full bg-white text-brand transition-all duration-500 group-hover:right-[calc(100%-36px)] group-hover:rotate-45">
         <ArrowUpRight size={16} />
       </div>
@@ -163,11 +163,11 @@ function MobileMenu({
 
             <motion.div variants={menuItem} className="mt-6">
               <a
-                href="/quote"
+                href="/membership"
                 onClick={onClose}
                 className="flex h-13 items-center justify-center gap-2 rounded-full bg-brand py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand/25 transition-transform duration-300 active:scale-[0.98]"
               >
-                Get a Quote
+                Become a Member
                 <ArrowUpRight size={16} />
               </a>
             </motion.div>
@@ -277,7 +277,7 @@ export function Navbar() {
                       href={link.href}
                       onClick={() => setActive(link.href)}
                       className={cn(
-                        "relative rounded-full px-6 py-2.5 text-sm font-semibold tracking-wide outline outline-transparent transition-colors duration-300",
+                        "relative rounded-full px-5 py-2.5 text-xs font-semibold tracking-wide outline outline-transparent transition-colors duration-300",
                         isActive
                           ? "text-white"
                           : "text-black hover:bg-black/5",
