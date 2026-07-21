@@ -133,7 +133,7 @@ export function Cta() {
 
           <Reveal delay={0.3}>
             <p className="mt-8 text-xs font-medium uppercase tracking-[0.16em] text-white/60">
-              42+ member countries · One partner per market · Protected leads
+              90+ member countries · One partner per market · Protected leads
             </p>
           </Reveal>
         </div>

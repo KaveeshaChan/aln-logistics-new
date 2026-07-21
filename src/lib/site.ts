@@ -70,10 +70,10 @@ export const navLinks = [
 ] as const;
 
 export const stats = [
-  { value: 42, suffix: "+", label: "Member countries" },
+  { value: 90, suffix: "+", label: "Member countries" },
   { value: 180, suffix: "+", label: "Vetted partners" },
   { value: 15, suffix: "K", label: "Vehicles moved / yr" },
-  { value: 12, suffix: "", label: "Years of trust" },
+  { value: 9, suffix: "", label: "Years of trust" },
 ] as const;
 
 export const services = [

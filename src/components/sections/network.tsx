@@ -59,7 +59,7 @@ const testimonials = [
 
 const stats = [
   {
-    value: 42,
+    value: 90,
     suffix: "+",
     label: "member countries across six continents",
     icon: AnchorIcon,
@@ -73,7 +73,7 @@ const stats = [
     caption: "From 2-wheelers to oversized units, door to door",
   },
   {
-    value: 12,
+    value: 9,
     suffix: "",
     label: "years connecting automobile logistics specialists",
     icon: Airplane01Icon,
