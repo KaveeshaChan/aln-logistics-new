@@ -1,8 +1,8 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 
 import { Logo } from "@/components/layout/logo";
@@ -13,6 +13,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
+import { galleryCategories } from "@/lib/gallery";
 import { navLinks, site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +34,110 @@ function QuoteButton({ className }: { className?: string }) {
         <ArrowUpRight size={16} />
       </div>
     </Button>
+  );
+}
+
+/** Desktop "Gallery" pill with an elegant dropdown of gallery categories. */
+function GalleryNavItem({
+  isActive,
+  onActivate,
+}: {
+  isActive: boolean;
+  onActivate: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const openNow = useCallback(() => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpen(true);
+  }, []);
+  const closeSoon = useCallback(() => {
+    closeTimer.current = setTimeout(() => setOpen(false), 120);
+  }, []);
+
+  return (
+    <NavigationMenuItem
+      className="relative"
+      onMouseEnter={openNow}
+      onMouseLeave={closeSoon}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") setOpen(false);
+      }}
+    >
+      <a
+        href="/gallery"
+        aria-haspopup="true"
+        aria-expanded={open}
+        onClick={onActivate}
+        onFocus={openNow}
+        className={cn(
+          "relative flex items-center gap-1 rounded-full px-5 py-2.5 text-xs font-semibold tracking-wide outline-none transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-brand/40",
+          isActive ? "text-white" : "text-black hover:bg-black/5",
+        )}
+      >
+        {isActive && (
+          <motion.span
+            layoutId="nav-active-pill"
+            transition={{ type: "spring", stiffness: 380, damping: 32 }}
+            className="absolute inset-0 -z-10 rounded-full bg-black shadow-sm"
+          />
+        )}
+        Gallery
+        <ChevronDown
+          size={13}
+          className={cn(
+            "transition-transform duration-300",
+            open && "rotate-180",
+          )}
+        />
+      </a>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.22, ease }}
+            className="absolute left-1/2 top-full z-50 w-[340px] -translate-x-1/2 pt-3"
+          >
+            <div className="overflow-hidden rounded-3xl border border-black/5 bg-white/95 p-2 shadow-2xl shadow-black/10 backdrop-blur-xl">
+              {galleryCategories.map((cat) => {
+                const Icon = cat.icon;
+                return (
+                  <a
+                    key={cat.slug}
+                    href={cat.href}
+                    onClick={onActivate}
+                    className="group/item flex items-center gap-3 rounded-2xl p-3 outline-none transition-colors hover:bg-neutral-50 focus-visible:bg-neutral-50"
+                  >
+                    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand transition-colors duration-300 group-hover/item:bg-brand group-hover/item:text-white">
+                      <Icon size={18} strokeWidth={2.2} />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-bold text-neutral-900">
+                        {cat.label}
+                      </span>
+                      <span className="block truncate text-xs text-neutral-500">
+                        {cat.tagline}
+                      </span>
+                    </span>
+                    <ArrowUpRight
+                      size={15}
+                      className="shrink-0 text-neutral-300 transition-all duration-300 group-hover/item:translate-x-0.5 group-hover/item:text-brand"
+                    />
+                  </a>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </NavigationMenuItem>
   );
 }
 
@@ -93,6 +198,91 @@ const menuItem = {
   show: { opacity: 1, y: 0, transition: { duration: 0.45, ease } },
 };
 
+/** Mobile "Gallery" row that expands into an accordion of categories. */
+function MobileGalleryItem({
+  index,
+  onClose,
+}: {
+  index: number;
+  onClose: () => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <motion.li
+      variants={menuItem}
+      className="border-b border-neutral-100 last:border-0"
+    >
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
+        className="group flex w-full items-center justify-between py-4 active:bg-neutral-50"
+      >
+        <span className="flex items-baseline gap-3">
+          <span className="font-heading text-xs font-bold tabular-nums text-neutral-300">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          <span className="font-heading text-2xl font-bold tracking-tight text-neutral-900 transition-colors group-hover:text-brand">
+            Gallery
+          </span>
+        </span>
+        <span
+          className={cn(
+            "grid size-9 place-items-center rounded-full bg-neutral-100 text-neutral-500 transition-all duration-300",
+            expanded ? "rotate-180 bg-brand text-white" : "group-hover:bg-brand/10",
+          )}
+        >
+          <ChevronDown size={16} />
+        </span>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease }}
+            className="overflow-hidden"
+          >
+            <ul className="flex flex-col gap-1 pb-3 pl-9">
+              <li>
+                <a
+                  href="/gallery"
+                  onClick={onClose}
+                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-neutral-500 active:bg-neutral-50"
+                >
+                  Overview
+                </a>
+              </li>
+              {galleryCategories.map((cat) => {
+                const Icon = cat.icon;
+                return (
+                  <li key={cat.slug}>
+                    <a
+                      href={cat.href}
+                      onClick={onClose}
+                      className="group/sub flex items-center gap-3 rounded-xl px-3 py-2.5 active:bg-neutral-50"
+                    >
+                      <span className="grid size-8 place-items-center rounded-lg bg-brand/10 text-brand">
+                        <Icon size={16} strokeWidth={2.2} />
+                      </span>
+                      <span className="text-sm font-semibold text-neutral-800 transition-colors group-hover/sub:text-brand">
+                        {cat.label}
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.li>
+  );
+}
+
 function MobileMenu({
   open,
   onClose,
@@ -133,7 +323,10 @@ function MobileMenu({
           >
             <nav aria-label="Mobile">
               <ul className="flex flex-col">
-                {navLinks.map((link, i) => (
+                {navLinks.map((link, i) =>
+                  link.href === "/gallery" ? (
+                    <MobileGalleryItem key={link.href} index={i} onClose={onClose} />
+                  ) : (
                   <motion.li
                     key={link.href}
                     variants={menuItem}
@@ -157,7 +350,8 @@ function MobileMenu({
                       </span>
                     </a>
                   </motion.li>
-                ))}
+                  ),
+                )}
               </ul>
             </nav>
 
@@ -267,10 +461,24 @@ export function Navbar() {
           <NavigationMenu className="max-lg:hidden rounded-full bg-white p-1.5 shadow-lg shadow-brand/5 z-10 absolute left-1/2 -translate-x-1/2">
             <NavigationMenuList className="flex gap-1.5">
               {navLinks.map((link) => {
-                const isActive =
-                  link.href.startsWith("/") && !link.href.includes("#")
-                    ? currentPath === link.href
-                    : active === link.href;
+                const isPathLink =
+                  link.href.startsWith("/") && !link.href.includes("#");
+                const isActive = isPathLink
+                  ? link.href === "/gallery"
+                    ? currentPath.startsWith("/gallery")
+                    : currentPath === link.href
+                  : active === link.href;
+
+                if (link.href === "/gallery") {
+                  return (
+                    <GalleryNavItem
+                      key={link.href}
+                      isActive={isActive}
+                      onActivate={() => setActive(link.href)}
+                    />
+                  );
+                }
+
                 return (
                   <NavigationMenuItem key={link.href}>
                     <NavigationMenuLink
