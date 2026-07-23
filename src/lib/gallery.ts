@@ -12,14 +12,16 @@ import { img } from "@/lib/site";
 /**
  * Gallery content model.
  *
- * All textual content — webinar titles, the full list of country videos, and
- * the achievement copy (including the ALN Benin Agent statement) — is preserved
- * from the legacy autologisticsnetwork.com gallery pages. Imagery is served from
- * the site's established Unsplash helper so every asset loads reliably in both
- * `next dev` and the static `out/` export; the legacy pages shipped template
- * placeholder photos rather than original ALN media, so curated logistics
- * imagery is a faithful, higher-quality stand-in.
+ * All content here — webinar flyers, achievement photos/videos and the real
+ * shipment/meeting photos — comes from the actual ALN media in
+ * `public/gallery/`, mirroring the legacy autologisticsnetwork.com gallery
+ * pages. Only the Videos page (19 country clips) still has no source footage
+ * to host, so it keeps curated placeholder imagery until real clips exist.
  */
+
+/** Encodes a filename (which may contain spaces/parens) into a public URL. */
+const gimg = (folder: string, filename: string) =>
+  `/gallery/${folder}/${encodeURIComponent(filename)}`;
 
 export type GallerySlug =
   | "webinars"
@@ -52,8 +54,8 @@ export const galleryCategories: GalleryCategory[] = [
     tagline: "Live sessions & recordings",
     description:
       "Member briefings on business opportunities and the future of automobile logistics.",
-    cover: img("photo-1553413077-190dd305871c", 1000),
-    count: "3 sessions",
+    cover: gimg("webinar", "webinar1.jpg"),
+    count: "4 sessions",
   },
   {
     slug: "photos",
@@ -62,9 +64,9 @@ export const galleryCategories: GalleryCategory[] = [
     icon: Camera,
     tagline: "Moments across the network",
     description:
-      "Operations, ports, meetings and events captured across the ALN partner network.",
-    cover: img("photo-1605902711622-cfb43c4437b5", 1000),
-    count: "18 photos",
+      "Real shipments, port operations and member meetings captured across the ALN network.",
+    cover: gimg("images", "3.jpg"),
+    count: "36 photos",
   },
   {
     slug: "videos",
@@ -96,7 +98,7 @@ export const galleryCategories: GalleryCategory[] = [
     tagline: "Milestones we're proud of",
     description:
       "Landmark shipments and member operations delivered across the globe.",
-    cover: img("photo-1586528116311-ad8dd3c8310d", 1000),
+    cover: gimg("videos", "ALN Benin Agent.jpg"),
     count: "4 milestones",
   },
 ];
@@ -109,56 +111,81 @@ export const galleryCategoryBySlug = Object.fromEntries(
 /*  Webinars                                                                    */
 /* -------------------------------------------------------------------------- */
 
+export interface WebinarImage {
+  src: string;
+  label: string;
+}
+
 export interface Webinar {
   id: string;
   title: string;
   date: string;
-  status: "recorded" | "upcoming";
-  duration: string;
   description: string;
   tags: string[];
-  image: string;
+  images: WebinarImage[];
   host: string;
   featured?: boolean;
 }
 
 export const webinars: Webinar[] = [
   {
-    id: "aln-3rd-webinar-2023",
-    title: "ALN 3rd Webinar — Automobile Logistics Beyond 2023",
-    date: "12 June 2023",
-    status: "recorded",
-    duration: "Session recording",
+    id: "aln-free-webinar-business-opportunities",
+    title: "ALN Free Webinar — Business Opportunities",
+    date: "30 November 2023",
     description:
-      "A forward-looking session bringing the network together to discuss where automobile logistics is heading — evolving trade lanes, RoRo capacity, and the opportunities members can unlock by cooperating across borders.",
-    tags: ["Industry outlook", "Members forum", "Trade lanes"],
-    image: img("photo-1553413077-190dd305871c", 1200),
-    host: "ALN Network",
+      "Global automotive logistics market trends (including electric vehicles), demand for global automotive logistics and the current state of the global automotive manufacturing market — an exclusive session for ALN members with morning and evening sittings.",
+    tags: ["Market trends", "Electric vehicles", "Members only"],
+    images: [
+      { src: gimg("webinar", "webinar1.jpg"), label: "Flyer" },
+      { src: gimg("webinar", "webinar2.jpg"), label: "Program" },
+    ],
+    host: "Mr. Mohan D. Meehitiya",
     featured: true,
   },
   {
-    id: "aln-free-webinar-business-opportunities",
-    title: "ALN Free Webinar — Business Opportunities",
-    date: "2022",
-    status: "recorded",
-    duration: "Session recording",
+    id: "aln-3rd-webinar-beyond-2023",
+    title: "ALN 3rd Webinar — Automobile Logistics Beyond 2023",
+    date: "13–14 June 2023",
     description:
-      "An open introduction to the business opportunities available across the ALN network — how handpicked members in each major automobile market cooperate to move brand-new and used units by road, rail, sea and air.",
-    tags: ["Getting started", "Membership", "Opportunities"],
-    image: img("photo-1494412574643-ff11b0a5c1c3", 1200),
+      "Welcome remarks, member introductions, ALN objectives and open member presentations — run as two live sessions over Zoom so every timezone across the network could join.",
+    tags: ["Two sessions", "Via Zoom", "Member presentations"],
+    images: [
+      {
+        src: gimg("webinar", "WhatsApp Image 2023-06-12 at 11.07.44 AM.jpeg"),
+        label: "Session times",
+      },
+      {
+        src: gimg("webinar", "WhatsApp Image 2023-06-12 at 11.07.54 AM.jpeg"),
+        label: "Flyer",
+      },
+    ],
     host: "ALN Network",
   },
   {
-    id: "aln-webinar-agenda-program",
-    title: "ALN Webinar — Agenda & Program",
-    date: "2023",
-    status: "recorded",
-    duration: "Program & agenda",
+    id: "evolution-of-automobile-logistics",
+    title: "The Evolution of Automobile Logistics",
+    date: "11 August 2022",
     description:
-      "The full agenda and program for the ALN members' webinar, outlining the topics, presentations and networking segments planned for the session.",
-    tags: ["Agenda", "Program", "Members forum"],
-    image: img("photo-1587293852726-70cdb56c2866", 1200),
-    host: "ALN Network",
+      "A look at the future of automobile logistics, the challenges of the time, and life after the COVID-19 outbreak — hosted with morning and evening Zoom sessions for members worldwide.",
+    tags: ["Post-COVID outlook", "Future of logistics"],
+    images: [
+      { src: gimg("images", "ALN Webinar final.jpg"), label: "Flyer" },
+      { src: gimg("images", "ALN Webinar Program.jpg"), label: "Program" },
+    ],
+    host: "Mr. Mohan D. Meehitiya",
+  },
+  {
+    id: "discover-new-business-opportunities",
+    title: "Discover New Business Opportunities",
+    date: "25 August 2021",
+    description:
+      "An ALN Conference/Webinar introducing the network's objectives, the responsibilities of members and the future business development plan — exclusive to all ALN members.",
+    tags: ["Conference webinar", "Member onboarding"],
+    images: [
+      { src: gimg("webinar", "image01.jpg"), label: "Flyer" },
+      { src: gimg("webinar", "image02.jpg"), label: "Agenda" },
+    ],
+    host: "Mr. Mohan Meehitiya",
   },
 ];
 
@@ -166,7 +193,7 @@ export const webinars: Webinar[] = [
 /*  Photos                                                                       */
 /* -------------------------------------------------------------------------- */
 
-export type PhotoAlbum = "Operations" | "Events & Meetings" | "Network";
+export type PhotoAlbum = "Operations" | "Events & Meetings";
 export type PhotoAspect = "portrait" | "landscape" | "square";
 
 export interface Photo {
@@ -178,46 +205,68 @@ export interface Photo {
   aspect: PhotoAspect;
 }
 
-const photo = (
-  photoId: string,
-  caption: string,
-  album: PhotoAlbum,
-  aspect: PhotoAspect,
-): Photo => ({
-  id: `${photoId}-${caption.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
-  src: img(photoId, 900, 70),
-  full: img(photoId, 2000, 80),
-  caption,
-  album,
-  aspect,
-});
+// Aspect ratios cycle to keep the masonry grid visually varied; every source
+// image is served at full quality since these are real, modest-sized photos.
+const aspectCycle: PhotoAspect[] = ["landscape", "portrait", "square", "portrait", "landscape"];
 
-export const photos: Photo[] = [
-  photo("photo-1605902711622-cfb43c4437b5", "Vehicle terminal at the port", "Operations", "landscape"),
-  photo("photo-1587293852726-70cdb56c2866", "RoRo vessel loading ramp", "Operations", "portrait"),
-  photo("photo-1519003722824-194d4455a60c", "Units staged for shipment", "Operations", "landscape"),
-  photo("photo-1586528116311-ad8dd3c8310d", "Car carrier on the move", "Operations", "square"),
-  photo("photo-1578575437130-527eed3abbec", "Inland haulage fleet", "Operations", "portrait"),
-  photo("photo-1494412574643-ff11b0a5c1c3", "Container terminal at dawn", "Operations", "landscape"),
-  photo("photo-1601584115197-04ecc0da31d7", "Deep-water port operations", "Operations", "square"),
-  photo("photo-1558618666-fcd25c85cd64", "Warehouse & PDI yard", "Operations", "landscape"),
-  photo("photo-1553413077-190dd305871c", "Members in session", "Events & Meetings", "portrait"),
-  photo("photo-1568605117036-5fe5e7bab0b7", "A single unit, ready to move", "Network", "landscape"),
-  photo("photo-1519003722824-194d4455a60c", "Coordinating a hand-off", "Events & Meetings", "square"),
-  photo("photo-1586528116311-ad8dd3c8310d", "Fleet in transit", "Network", "portrait"),
-  photo("photo-1605902711622-cfb43c4437b5", "Global gateway", "Network", "landscape"),
-  photo("photo-1558618666-fcd25c85cd64", "Value-added handling", "Operations", "square"),
-  photo("photo-1601584115197-04ecc0da31d7", "One partner per country", "Network", "portrait"),
-  photo("photo-1494412574643-ff11b0a5c1c3", "Trade lanes that connect", "Network", "landscape"),
-  photo("photo-1578575437130-527eed3abbec", "Door-to-door delivery", "Operations", "square"),
-  photo("photo-1587293852726-70cdb56c2866", "From ramp to road", "Operations", "landscape"),
+const operationsFiles = [
+  "1 (1).jpg",
+  "1.jpg",
+  "2 (1).jpg",
+  "2.jpg",
+  "3.jpg",
+  "4.jpg",
+  "5.jpg",
+  "6.jpg",
+  "7.jpg",
+  "8.jpg",
+  "9.jpg",
+  "10.jpg",
+  "11.jpg",
+  "12.jpg",
+  "13.jpg",
+  "14.jpg",
+  "15.jpg",
+  "16.jpg",
+  "17.jpg",
+  "18.jpg",
+  "19.jpg",
+  "20.jpg",
+  "21.jpg",
+  "22.jpg",
+  "23.jpg",
+  "24.jpg",
+  "25.jpg",
+  "26.jpg",
+  "27.jpg",
+  "28.jpg",
+  "29.jpg",
+  "30.jpg",
 ];
 
-export const photoAlbums: PhotoAlbum[] = [
-  "Operations",
-  "Events & Meetings",
-  "Network",
-];
+const eventsFiles = ["web1.jpg", "web2.jpg", "web3.jpg", "web4.jpg"];
+
+const operationsPhotos: Photo[] = operationsFiles.map((file, i) => ({
+  id: `ops-${file}`,
+  src: gimg("images", file),
+  full: gimg("images", file),
+  caption: `ALN shipment — Operations ${i + 1}`,
+  album: "Operations",
+  aspect: aspectCycle[i % aspectCycle.length],
+}));
+
+const eventsPhotos: Photo[] = eventsFiles.map((file, i) => ({
+  id: `evt-${file}`,
+  src: gimg("images", file),
+  full: gimg("images", file),
+  caption: `ALN member session ${i + 1}`,
+  album: "Events & Meetings",
+  aspect: aspectCycle[(i + 2) % aspectCycle.length],
+}));
+
+export const photos: Photo[] = [...operationsPhotos, ...eventsPhotos];
+
+export const photoAlbums: PhotoAlbum[] = ["Operations", "Events & Meetings"];
 
 /* -------------------------------------------------------------------------- */
 /*  Videos                                                                       */
@@ -288,7 +337,7 @@ export const videoRegions: VideoRegion[] = [
 ];
 
 /* -------------------------------------------------------------------------- */
-/*  Achievements                                                                */
+/*  Achievements                                                               */
 /* -------------------------------------------------------------------------- */
 
 export interface Achievement {
@@ -296,40 +345,45 @@ export interface Achievement {
   title: string;
   location: string;
   description: string;
-  image: string;
+  images: string[];
+  videos: string[];
 }
 
 export const achievements: Achievement[] = [
-  {
-    id: "benin-agent",
-    title: "ALN Benin Agent",
-    location: "West Africa · Togo, Nigeria, Benin",
-    description:
-      "First Move Logistics is proud to handle for US Embassy in Niger. We handled shipment of 8 armored vehicles including recovery tools, spare parts strapped inside the vehicle from South Africa to US Embassy in Niger (West Africa). In addition, two units of vehicle spare parts are also being shipped.",
-    image: img("photo-1586528116311-ad8dd3c8310d", 1200),
-  },
   {
     id: "qatar-agent",
     title: "Qatar Agent",
     location: "Qatar · Middle East",
     description:
-      "Our Qatar member extends the network's reach across the Gulf, coordinating automobile movements in and out of one of the region's busiest trade hubs.",
-    image: img("photo-1601584115197-04ecc0da31d7", 1200),
+      "Our Qatar member extends the network's reach across the Gulf, coordinating automobile movements through one of the region's busiest trade hubs.",
+    images: [],
+    videos: [gimg("videos", "achievement.mp4")],
   },
   {
     id: "egypt-agent",
     title: "Egypt Agent",
     location: "Egypt · North Africa",
     description:
-      "Our Egypt member anchors the network at the crossroads of Africa, the Mediterranean and the Middle East, handling vehicle logistics through key regional gateways.",
-    image: img("photo-1494412574643-ff11b0a5c1c3", 1200),
+      "Mobile crane units handled and shipped through ALN's Egypt member — heavy-equipment logistics at the crossroads of Africa, the Mediterranean and the Middle East.",
+    images: [gimg("videos", "Egyptagent.jpg")],
+    videos: [gimg("videos", "1.mp4"), gimg("videos", "2.mp4")],
+  },
+  {
+    id: "benin-agent",
+    title: "ALN Benin Agent",
+    location: "West Africa · Togo, Nigeria, Benin",
+    description:
+      "First Move Logistics is proud to handle for US Embassy in Niger. We handled shipment of 8 armored vehicles including recovery tools, spare parts strapped inside the vehicle from South Africa to US Embassy in Niger (West Africa). In addition, two units of vehicle spare parts are also being shipped.",
+    images: [gimg("videos", "ALN Benin Agent.jpg")],
+    videos: [],
   },
   {
     id: "fiji-agent",
     title: "ALN Fiji Agent",
     location: "Fiji · Oceania",
     description:
-      "Our Fiji member brings the network to the Pacific, connecting island markets to the global automobile logistics chain.",
-    image: img("photo-1605902711622-cfb43c4437b5", 1200),
+      "ALN's Fiji member, CGM Freights Pte Ltd, opened a $250,000 container freight station in Lautoka with support from the Fijian Government — a milestone covered in national press, profiling director Krishneel Kumar.",
+    images: [gimg("videos", "FIJI.jpg"), gimg("videos", "Fiji Post.jpg")],
+    videos: [],
   },
 ];

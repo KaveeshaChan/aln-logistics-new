@@ -2,65 +2,61 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { ArrowUpRight, Play, Search, Sparkles } from "lucide-react";
+import { Images, Search, Sparkles } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import { CategoryTabs } from "@/components/gallery/category-tabs";
+import { Lightbox, type LightboxItem } from "@/components/gallery/lightbox";
 import { Reveal } from "@/components/motion/reveal";
 import { webinars, type Webinar } from "@/lib/gallery";
-import { cn } from "@/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-function StatusBadge({ status }: { status: Webinar["status"] }) {
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold",
-        status === "upcoming"
-          ? "bg-emerald-500/10 text-emerald-600"
-          : "bg-brand/10 text-brand",
-      )}
-    >
-      <span
-        className={cn(
-          "size-1.5 rounded-full",
-          status === "upcoming" ? "bg-emerald-500" : "bg-brand",
-        )}
-      />
-      {status === "upcoming" ? "Upcoming" : "Recorded"}
-    </span>
-  );
+function webinarLightboxItems(webinar: Webinar): LightboxItem[] {
+  return webinar.images.map((img) => ({
+    full: img.src,
+    caption: `${webinar.title} — ${img.label}`,
+  }));
 }
 
-function FeaturedWebinar({ webinar }: { webinar: Webinar }) {
+function FeaturedWebinar({
+  webinar,
+  onOpen,
+}: {
+  webinar: Webinar;
+  onOpen: (index: number) => void;
+}) {
   return (
     <Reveal>
       <article className="group grid overflow-hidden rounded-[1.75rem] border border-black/5 bg-white shadow-sm lg:grid-cols-2">
-        <div className="relative aspect-[16/10] overflow-hidden lg:aspect-auto">
+        <button
+          type="button"
+          onClick={() => onOpen(0)}
+          aria-label={`View ${webinar.title} flyer full-size`}
+          className="relative aspect-[16/10] overflow-hidden outline-none lg:aspect-auto"
+        >
           <Image
-            src={webinar.image}
-            alt=""
+            src={webinar.images[0].src}
+            alt={`${webinar.title} — ${webinar.images[0].label}`}
             fill
             sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/60 to-transparent lg:bg-gradient-to-r" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/50 to-transparent lg:bg-gradient-to-r" />
           <span className="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-brand shadow-lg backdrop-blur">
             <Sparkles size={13} /> Featured
           </span>
-          <span className="absolute left-1/2 top-1/2 grid size-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-brand shadow-xl transition-transform duration-300 group-hover:scale-110">
-            <Play size={24} className="ml-0.5 fill-brand" />
-          </span>
-        </div>
+          {webinar.images.length > 1 && (
+            <span className="absolute right-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur">
+              <Images size={13} /> {webinar.images.length} images
+            </span>
+          )}
+        </button>
 
         <div className="flex flex-col justify-center gap-4 p-7 sm:p-10">
-          <div className="flex items-center gap-3">
-            <StatusBadge status={webinar.status} />
-            <span className="text-xs font-medium text-neutral-400">
-              {webinar.date}
-            </span>
-          </div>
+          <span className="text-xs font-medium text-neutral-400">
+            {webinar.date}
+          </span>
           <h2 className="font-heading text-2xl font-extrabold leading-tight tracking-tight text-neutral-900 text-balance sm:text-3xl">
             {webinar.title}
           </h2>
@@ -77,17 +73,17 @@ function FeaturedWebinar({ webinar }: { webinar: Webinar }) {
               </span>
             ))}
           </div>
-          <div className="mt-2 flex flex-wrap items-center gap-4">
-            <a
-              href="/contact"
-              className="group/btn inline-flex h-11 items-center gap-2 rounded-full bg-brand px-6 text-sm font-semibold text-white shadow-lg shadow-brand/25 transition-transform duration-300 hover:-translate-y-0.5"
-            >
-              Request recording
-              <ArrowUpRight
-                size={16}
-                className="transition-transform duration-300 group-hover/btn:rotate-45"
-              />
-            </a>
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            {webinar.images.map((im, i) => (
+              <button
+                key={im.label}
+                type="button"
+                onClick={() => onOpen(i)}
+                className="rounded-full border border-black/10 px-4 py-2 text-xs font-semibold text-neutral-600 transition-colors hover:border-brand/40 hover:text-brand"
+              >
+                View {im.label}
+              </button>
+            ))}
             <span className="text-xs text-neutral-400">
               Hosted by {webinar.host}
             </span>
@@ -98,7 +94,15 @@ function FeaturedWebinar({ webinar }: { webinar: Webinar }) {
   );
 }
 
-function WebinarCard({ webinar, index }: { webinar: Webinar; index: number }) {
+function WebinarCard({
+  webinar,
+  index,
+  onOpen,
+}: {
+  webinar: Webinar;
+  index: number;
+  onOpen: (index: number) => void;
+}) {
   return (
     <motion.article
       layout
@@ -108,26 +112,30 @@ function WebinarCard({ webinar, index }: { webinar: Webinar; index: number }) {
       transition={{ duration: 0.5, delay: index * 0.06, ease }}
       className="group flex flex-col overflow-hidden rounded-3xl border border-black/5 bg-white shadow-sm transition-shadow duration-500 hover:shadow-xl hover:shadow-brand/10"
     >
-      <div className="relative aspect-[16/10] overflow-hidden">
+      <button
+        type="button"
+        onClick={() => onOpen(0)}
+        aria-label={`View ${webinar.title} full-size`}
+        className="relative aspect-[16/10] overflow-hidden outline-none"
+      >
         <Image
-          src={webinar.image}
-          alt=""
+          src={webinar.images[0].src}
+          alt={`${webinar.title} — ${webinar.images[0].label}`}
           fill
           sizes="(max-width: 1024px) 100vw, 33vw"
           className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/50 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-        <span className="absolute left-4 top-4">
-          <StatusBadge status={webinar.status} />
+        <span className="absolute left-4 top-4 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-brand shadow backdrop-blur">
+          {webinar.date}
         </span>
-        <span className="absolute right-4 top-4 grid size-11 place-items-center rounded-full bg-white/90 text-brand opacity-0 shadow-lg transition-all duration-500 group-hover:opacity-100">
-          <Play size={18} className="ml-0.5 fill-brand" />
-        </span>
-      </div>
+        {webinar.images.length > 1 && (
+          <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
+            <Images size={11} /> {webinar.images.length}
+          </span>
+        )}
+      </button>
       <div className="flex flex-1 flex-col gap-3 p-6">
-        <span className="text-xs font-medium text-neutral-400">
-          {webinar.date} · {webinar.duration}
-        </span>
         <h3 className="font-heading text-lg font-bold leading-snug tracking-tight text-neutral-900 transition-colors group-hover:text-brand">
           {webinar.title}
         </h3>
@@ -151,6 +159,8 @@ function WebinarCard({ webinar, index }: { webinar: Webinar; index: number }) {
 
 export function WebinarsContent() {
   const [query, setQuery] = useState("");
+  const [active, setActive] = useState<Webinar | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const searching = query.trim().length > 0;
 
   const filtered = useMemo(() => {
@@ -165,9 +175,12 @@ export function WebinarsContent() {
   }, [query]);
 
   const featured = webinars.find((w) => w.featured);
-  const gridItems = searching
-    ? filtered
-    : webinars.filter((w) => !w.featured);
+  const gridItems = searching ? filtered : webinars.filter((w) => !w.featured);
+
+  const openWebinar = (webinar: Webinar, index: number) => {
+    setActive(webinar);
+    setLightboxIndex(index);
+  };
 
   return (
     <>
@@ -175,7 +188,12 @@ export function WebinarsContent() {
 
       <section className="bg-white px-5 py-14 sm:px-8 sm:py-16">
         <div className="mx-auto max-w-6xl">
-          {!searching && featured && <FeaturedWebinar webinar={featured} />}
+          {!searching && featured && (
+            <FeaturedWebinar
+              webinar={featured}
+              onOpen={(i) => openWebinar(featured, i)}
+            />
+          )}
 
           {/* Controls */}
           <Reveal className="mt-14 flex flex-col gap-4 sm:mt-16 sm:flex-row sm:items-center sm:justify-between">
@@ -210,7 +228,12 @@ export function WebinarsContent() {
               >
                 <AnimatePresence mode="popLayout">
                   {gridItems.map((w, i) => (
-                    <WebinarCard key={w.id} webinar={w} index={i} />
+                    <WebinarCard
+                      key={w.id}
+                      webinar={w}
+                      index={i}
+                      onOpen={(idx) => openWebinar(w, idx)}
+                    />
                   ))}
                 </AnimatePresence>
               </motion.div>
@@ -222,6 +245,13 @@ export function WebinarsContent() {
           </div>
         </div>
       </section>
+
+      <Lightbox
+        items={active ? webinarLightboxItems(active) : []}
+        index={active ? lightboxIndex : null}
+        onIndexChange={setLightboxIndex}
+        onClose={() => setActive(null)}
+      />
     </>
   );
 }

@@ -7,11 +7,17 @@ import { AnimatePresence, motion } from "motion/react";
 import { CategoryTabs } from "@/components/gallery/category-tabs";
 import { Lightbox } from "@/components/gallery/lightbox";
 import { Reveal } from "@/components/motion/reveal";
-import { photoAlbums, photos, type PhotoAlbum } from "@/lib/gallery";
+import { photoAlbums, photos, type PhotoAlbum, type PhotoAspect } from "@/lib/gallery";
 import { cn } from "@/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 type Filter = "All" | PhotoAlbum;
+
+const aspectClass: Record<PhotoAspect, string> = {
+  landscape: "aspect-[4/3]",
+  portrait: "aspect-[3/4]",
+  square: "aspect-square",
+};
 
 export function PhotosContent() {
   const [filter, setFilter] = useState<Filter>("All");
@@ -86,23 +92,28 @@ export function PhotosContent() {
                   aria-label={`Open “${p.caption}”`}
                   className="group relative block w-full break-inside-avoid overflow-hidden rounded-2xl bg-neutral-100 outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
                 >
-                  {/* skeleton */}
-                  {!loaded[p.id] && (
-                    <div className="aspect-[4/5] w-full animate-pulse bg-neutral-200" />
-                  )}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={p.src}
-                    alt={p.caption}
-                    loading="lazy"
-                    onLoad={() =>
-                      setLoaded((prev) => ({ ...prev, [p.id]: true }))
-                    }
-                    className={cn(
-                      "w-full object-cover transition-all duration-700 group-hover:scale-105",
-                      loaded[p.id] ? "block" : "hidden",
-                    )}
-                  />
+                  <div className={cn("relative w-full", aspectClass[p.aspect])}>
+                    {/* skeleton overlay — fades out once the image decodes */}
+                    <div
+                      className={cn(
+                        "absolute inset-0 animate-pulse bg-neutral-200 transition-opacity duration-500",
+                        loaded[p.id] ? "opacity-0" : "opacity-100",
+                      )}
+                    />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={p.src}
+                      alt={p.caption}
+                      loading="lazy"
+                      onLoad={() =>
+                        setLoaded((prev) => ({ ...prev, [p.id]: true }))
+                      }
+                      className={cn(
+                        "absolute inset-0 size-full object-cover transition-opacity duration-700 group-hover:scale-105",
+                        loaded[p.id] ? "opacity-100" : "opacity-0",
+                      )}
+                    />
+                  </div>
                   {/* hover overlay */}
                   <div className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-ink/80 via-ink/10 to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                     <span className="flex items-center justify-between gap-2">
