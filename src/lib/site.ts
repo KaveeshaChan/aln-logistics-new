@@ -37,8 +37,8 @@ export const site = {
   name: "ALN",
   fullName: "Automobile Logistics Network",
   tagline: "Handpicked freight forwarders & logistics providers worldwide",
-  email: "info@autologisticsnetwork.com",
-  phone: "+94 75 543 2089",
+  email: "admin1@autologisticsnetwork.com",
+  phone: "+94762011272",
   address: "No 88, Level 03, Justice Akbar Mawatha, Colombo 02, Sri Lanka",
 };
 
@@ -176,6 +176,182 @@ export const objectives = [
   {
     title: "The Specialty",
     body: "Automobile logistics is a specialised, high-revenue sector few forwarders master. ALN members are strengthened by sharing market sizes, opportunities and operational hints to become true specialists in the trade.",
+  },
+] as const;
+
+export type MembershipCell =
+  | true
+  | false
+  | { star: string }
+  | { text: string };
+
+export const membershipTiers = [
+  {
+    key: "trial",
+    name: "Trial",
+    price: "Free",
+    period: "6 months complimentary",
+    blurb: "Explore the network before you commit.",
+    cta: "Start Trial",
+    featured: false,
+  },
+  {
+    key: "standard",
+    name: "Standard",
+    price: "$500",
+    period: "per year",
+    blurb: "Full membership access, year-round.",
+    cta: "Join Standard",
+    featured: false,
+  },
+  {
+    key: "premium",
+    name: "Premium",
+    price: "$1,000",
+    period: "per year",
+    blurb: "Priority placement, front of the line.",
+    cta: "Go Premium",
+    featured: true,
+  },
+] as const;
+
+export const membershipBenefits: {
+  category: string;
+  rows: {
+    label: string;
+    trial: MembershipCell;
+    standard: MembershipCell;
+    premium: MembershipCell;
+  }[];
+}[] = [
+  {
+    category: "Network & Community",
+    rows: [
+      {
+        label: "Access to the ALN Member Community",
+        trial: true,
+        standard: true,
+        premium: true,
+      },
+      {
+        label: "Company Listing in the ALN Member Directory",
+        trial: true,
+        standard: true,
+        premium: true,
+      },
+      {
+        label: "Business Introductions within the ALN Network",
+        trial: true,
+        standard: true,
+        premium: { star: "Priority" },
+      },
+      {
+        label:
+          "Business Opportunities through ALN's Outreach to Exporters, Importers & Automotive Companies",
+        trial: true,
+        standard: true,
+        premium: { star: "Priority" },
+      },
+    ],
+  },
+  {
+    category: "Events & Engagement",
+    rows: [
+      {
+        label: "Participation in Webinars",
+        trial: true,
+        standard: true,
+        premium: true,
+      },
+      {
+        label: "Participation in Pocket Meetings",
+        trial: true,
+        standard: true,
+        premium: true,
+      },
+      {
+        label: "Eligibility to Attend ALN Annual Conferences*",
+        trial: true,
+        standard: true,
+        premium: true,
+      },
+      {
+        label: "Member Communication Channels",
+        trial: true,
+        standard: true,
+        premium: true,
+      },
+    ],
+  },
+  {
+    category: "Status & Visibility",
+    rows: [
+      {
+        label: "Official ALN Member Status",
+        trial: false,
+        standard: true,
+        premium: true,
+      },
+      {
+        label: "Dedicated Company Profile on the ALN Website",
+        trial: false,
+        standard: true,
+        premium: { star: "Featured" },
+      },
+      {
+        label: "Promotion through ALN LinkedIn",
+        trial: false,
+        standard: true,
+        premium: { star: "Featured" },
+      },
+      {
+        label: "Inclusion in ALN Newsletters",
+        trial: false,
+        standard: true,
+        premium: { star: "Priority Placement" },
+      },
+      {
+        label: "Member-to-Member Referrals",
+        trial: false,
+        standard: true,
+        premium: { star: "Priority" },
+      },
+    ],
+  },
+  {
+    category: "Premium Privileges",
+    rows: [
+      {
+        label: "Priority Support from ALN Administration",
+        trial: false,
+        standard: false,
+        premium: true,
+      },
+      {
+        label: "Premium Member / Elite Member Badge",
+        trial: false,
+        standard: false,
+        premium: true,
+      },
+      {
+        label: "Priority Visibility at Conferences & Events",
+        trial: false,
+        standard: false,
+        premium: true,
+      },
+      {
+        label: "Complimentary / Discounted Conference Registration",
+        trial: false,
+        standard: false,
+        premium: true,
+      },
+      {
+        label: "ALN Payment Protection Plan (PPP)",
+        trial: false,
+        standard: { text: "Optional (USD 350/year)" },
+        premium: { text: "Included" },
+      },
+    ],
   },
 ] as const;
 

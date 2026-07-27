@@ -86,7 +86,7 @@ const infoCards = [
   {
     icon: Call02Icon,
     label: "Call us",
-    lines: [site.phone, "+94 769 71 9994"],
+    lines: [site.phone],
     href: `tel:${site.phone.replace(/\s/g, "")}`,
     cta: "Start a call",
   },

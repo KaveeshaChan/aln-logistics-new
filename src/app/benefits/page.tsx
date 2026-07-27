@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { BenefitsHeader } from "@/components/benefits/benefits-content";
+import { MembershipTable } from "@/components/benefits/membership-table";
 import { Advantages } from "@/components/sections/advantages";
 import { Objectives } from "@/components/sections/objectives";
 import { Stats } from "@/components/sections/stats";
@@ -20,6 +21,7 @@ export default function BenefitsPage() {
       <Navbar />
       <main className="flex-1">
         <BenefitsHeader />
+        <MembershipTable />
         <Advantages />
         <Objectives />
         <Stats />
