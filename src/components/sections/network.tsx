@@ -29,13 +29,6 @@ const testimonials = [
   },
   {
     quote:
-      "ALN's one-member-per-country policy means zero internal competition. Every lead we pass stays protected — and it comes back.",
-    name: "Daniel Okafor",
-    role: "CEO, Lagos Vehicle Logistics",
-    company: "Nigeria",
-  },
-  {
-    quote:
       "From customs paperwork to yard storage, the network covered our client's full door-to-door move across three continents.",
     name: "Sofia Almeida",
     role: "Operations Head, Lisbon",

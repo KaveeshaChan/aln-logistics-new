@@ -30,7 +30,7 @@ function FloatingShapes() {
   const blobs = [
     { className: "left-[8%] top-[18%] size-64 bg-brand/30", d: 9 },
     { className: "right-[10%] top-[12%] size-72 bg-brand/20", d: 12 },
-    { className: "left-[38%] bottom-[6%] size-56 bg-orange-400/20", d: 11 },
+    { className: "left-[38%] bottom-[6%] size-56 bg-[#2e5aac]/20", d: 11 },
   ];
 
   return (
@@ -147,7 +147,7 @@ export function GalleryHero({
                 <span
                   className={cn(
                     isHi &&
-                      "bg-gradient-to-r from-brand via-orange-400 to-brand bg-clip-text text-transparent",
+                      "bg-gradient-to-r from-brand via-[#4c77b8] to-brand bg-clip-text text-transparent",
                   )}
                 >
                   {w}

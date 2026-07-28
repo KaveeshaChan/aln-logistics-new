@@ -21,15 +21,15 @@ export const img = (id: string, w = 1200, q = 70) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=${q}`;
 
 export const PHOTOS = {
-  heroPort: "photo-1605902711622-cfb43c4437b5",
+  heroPort: "photo-1774929103756-a46897cda71b",
   carLoading: "photo-1519003722824-194d4455a60c",
-  shipRamp: "photo-1587293852726-70cdb56c2866",
+  shipRamp: "photo-1522674149721-b0191358dc5c",
   carSingle: "photo-1568605117036-5fe5e7bab0b7",
-  truck: "photo-1578575437130-527eed3abbec",
+  truck: "photo-1742940796395-b2a614941353",
   containers: "photo-1494412574643-ff11b0a5c1c3",
-  warehouse: "photo-1558618666-fcd25c85cd64",
+  warehouse: "photo-1770319942638-a5989632f2ad",
   logistics: "photo-1553413077-190dd305871c",
-  carCarrier: "photo-1586528116311-ad8dd3c8310d",
+  carCarrier: "photo-1761917904658-2a9ecb84a169",
   port2: "photo-1601584115197-04ecc0da31d7",
 } as const;
 
