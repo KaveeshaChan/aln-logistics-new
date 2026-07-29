@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Sora, Geist_Mono } from "next/font/google";
+import "flag-icons/css/flag-icons.min.css";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/lib/auth-context";

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight, ChevronDown } from "lucide-react";
+import { ArrowUpRight, ChevronDown, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
@@ -16,6 +16,7 @@ import {
 import { galleryCategories } from "@/lib/gallery";
 import { navLinks, site } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth-context";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -32,6 +33,30 @@ function QuoteButton({ className }: { className?: string }) {
       <span className="relative z-10">Become a Member</span>
       <div className="absolute right-1 flex size-8 items-center justify-center rounded-full bg-white text-brand transition-all duration-500 group-hover:right-[calc(100%-36px)] group-hover:rotate-45">
         <ArrowUpRight size={16} />
+      </div>
+    </Button>
+  );
+}
+
+function LogoutButton({
+  className,
+  onLogout,
+}: {
+  className?: string;
+  onLogout: () => void;
+}) {
+  return (
+    <Button
+      type="button"
+      onClick={onLogout}
+      className={cn(
+        "group relative h-10 w-fit overflow-hidden rounded-full p-1 ps-4 pe-12 text-sm font-medium transition-all duration-500 bg-brand text-white hover:bg-brand/80 hover:ps-12 hover:pe-4",
+        className,
+      )}
+    >
+      <span className="relative z-10">Logout</span>
+      <div className="absolute right-1 flex size-8 items-center justify-center rounded-full bg-white text-brand transition-all duration-500 group-hover:right-[calc(100%-36px)] group-hover:rotate-45">
+        <LogOut size={16} />
       </div>
     </Button>
   );
@@ -286,9 +311,13 @@ function MobileGalleryItem({
 function MobileMenu({
   open,
   onClose,
+  isLoggedIn,
+  onLogout,
 }: {
   open: boolean;
   onClose: () => void;
+  isLoggedIn: boolean;
+  onLogout: () => void;
 }) {
   // Lock page scroll while the menu is open
   useEffect(() => {
@@ -356,14 +385,28 @@ function MobileMenu({
             </nav>
 
             <motion.div variants={menuItem} className="mt-6">
-              <a
-                href="/membership"
-                onClick={onClose}
-                className="flex h-13 items-center justify-center gap-2 rounded-full bg-brand py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand/25 transition-transform duration-300 active:scale-[0.98]"
-              >
-                Become a Member
-                <ArrowUpRight size={16} />
-              </a>
+              {isLoggedIn ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onLogout();
+                  }}
+                  className="flex h-13 w-full items-center justify-center gap-2 rounded-full bg-brand py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand/25 transition-transform duration-300 active:scale-[0.98]"
+                >
+                  Logout
+                  <LogOut size={16} />
+                </button>
+              ) : (
+                <a
+                  href="/membership"
+                  onClick={onClose}
+                  className="flex h-13 items-center justify-center gap-2 rounded-full bg-brand py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand/25 transition-transform duration-300 active:scale-[0.98]"
+                >
+                  Become a Member
+                  <ArrowUpRight size={16} />
+                </a>
+              )}
             </motion.div>
 
             <motion.div
@@ -387,6 +430,13 @@ function MobileMenu({
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [active, setActive] = useState<string | null>(null);
+  const { user, logout } = useAuth();
+
+  const handleLogout = useCallback(() => {
+    logout().then(() => {
+      window.location.href = "/login/";
+    });
+  }, [logout]);
 
   const handleResize = useCallback(() => {
     if (window.innerWidth >= 1024) setIsOpen(false);
@@ -511,7 +561,14 @@ export function Navbar() {
           </NavigationMenu>
 
           <div className="flex items-center gap-3 flex-shrink-0 z-10">
-            <QuoteButton className="hidden lg:flex shadow-lg shadow-brand/5" />
+            {user ? (
+              <LogoutButton
+                className="hidden lg:flex shadow-lg shadow-brand/5"
+                onLogout={handleLogout}
+              />
+            ) : (
+              <QuoteButton className="hidden lg:flex shadow-lg shadow-brand/5" />
+            )}
 
             <div className="lg:hidden">
               <MenuToggle open={isOpen} onToggle={() => setIsOpen(!isOpen)} />
@@ -520,7 +577,12 @@ export function Navbar() {
         </nav>
       </div>
 
-      <MobileMenu open={isOpen} onClose={() => setIsOpen(false)} />
+      <MobileMenu
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        isLoggedIn={!!user}
+        onLogout={handleLogout}
+      />
     </header>
   );
 }

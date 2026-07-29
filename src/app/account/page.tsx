@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
-import { AccountContent, AccountHeader } from "@/components/account/account-content";
+import { AccountContent } from "@/components/account/account-content";
 
 export const metadata: Metadata = {
   title: "My Account | Automobile Logistics Network",
@@ -14,8 +14,7 @@ export default function AccountPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <Navbar />
       <main className="flex-1">
-        <AccountHeader />
-        <section className="bg-white px-5 py-16 text-black sm:px-8 sm:py-20">
+        <section className="bg-white px-5 pt-32 pb-16 text-black sm:px-8 sm:pt-40 sm:pb-20">
           <AccountContent />
         </section>
       </main>
