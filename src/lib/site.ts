@@ -96,7 +96,7 @@ export const services = [
     icon: DeliveryTruck01Icon,
     title: "Road & Rail Haulage",
     description:
-      "Specialised car-carrier fleets and multimodal rail links deliver door-to-door inland transport with real-time tracking.",
+      "Specialized car-carrier fleets and multimodal rail links deliver door-to-door inland transport with real-time tracking.",
     photo: PHOTOS.truck,
     tags: [
       "Car carriers",
@@ -109,7 +109,7 @@ export const services = [
     icon: Airplane01Icon,
     title: "Air Freight & Express",
     description:
-      "Time-critical automotive parts and high-value units flown worldwide with prioritised customs clearance.",
+      "Time-critical automotive parts and high-value units flown worldwide with prioritized customs clearance.",
     photo: PHOTOS.containers,
     tags: [
       "Time-critical",
@@ -136,9 +136,9 @@ export const services = [
 export const advantages = [
   {
     icon: GlobalIcon,
-    title: "One trusted partner per country",
+    title: "Strategic market representation",
     description:
-      "ALN admits a single, handpicked member in each major automotive market — no internal competition, just seamless cooperation.",
+      "ALN appoints qualified members in strategic markets to ensure trusted service, specialized expertise, faster responses, and greater business opportunities.",
   },
   {
     icon: Shield01Icon,
@@ -150,32 +150,31 @@ export const advantages = [
     icon: ShippingTruck01Icon,
     title: "End-to-end coverage",
     description:
-      "From 2-wheelers to oversized units, road, rail, sea and air — total solutions regardless of the size of the requirement.",
+      "From vehicles and automotive spare parts to tyres, oversized cargo, road, rail, sea and air — total logistics solutions regardless of the size of the requirement.",
   },
   {
     icon: Time04Icon,
     title: "Low cost, high return",
     description:
-      "Members share operational and marketing insight to move vehicles at low cost with a high, mutually beneficial return.",
+      "Members share operational and marketing insight to move automotive cargo at low cost with a high, mutually beneficial return.",
   },
 ] as const;
 
 export const objectives = [
   {
     title: "ALN Objectives",
-    body: "To build a global network that supports end-to-end logistics solutions for the automobile industry — delivering brand new and used units from 2-wheelers up to oversized automobiles from manufacturer to end-user via road, rail, sea or air.",
-  },
+    body: "To build a global network that supports end-to-end logistics solutions for the automotive industry — delivering brand new and used vehicles, automotive spare parts, tyres, and related automotive cargo from manufacturer to end-user via road, rail, sea or air."},
   {
     title: "Why ALN",
-    body: "An automobile is a global product that moves across every country. Manufacturers, traders, dealers and end-users all look for reliable service providers in their region — and that is exactly where ALN partners step in.",
+    body: "The global automotive industry depends on trusted logistics partners. ALN connects members not only with one another but also with exporters, importers, manufacturers, dealers, and other businesses across the automotive supply chain, creating greater opportunities for international cooperation and business growth."
   },
   {
     title: "Service Scope",
-    body: "Members cooperate to offer complete logistics services: ocean and RoRo shipping, inland haulage, air freight, customs clearance, warehousing, pre-delivery inspection and value-added handling.",
+    body: "Members cooperate to offer complete logistics solutions including ocean and RoRo shipping, inland haulage, air freight, customs clearance, warehousing, pre-delivery inspection, value-added handling, and the transportation of vehicles, automotive spare parts, tyres, and related automotive cargo."
   },
   {
     title: "The Specialty",
-    body: "Automobile logistics is a specialised, high-revenue sector few forwarders master. ALN members are strengthened by sharing market sizes, opportunities and operational hints to become true specialists in the trade.",
+    body: "Automobile logistics is a specialised, high-revenue sector that few forwarders truly master. ALN strengthens its members through business development, shared market intelligence, operational expertise, and global collaboration, helping them become recognised specialists within the automotive logistics industry."
   },
 ] as const;
 

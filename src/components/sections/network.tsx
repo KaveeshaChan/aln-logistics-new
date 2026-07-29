@@ -15,7 +15,7 @@ import { Reveal, Stagger } from "@/components/motion/reveal";
 const testimonials = [
   {
     quote:
-      "Having one vetted partner in every market changed how we quote. RoRo bookings that took a week of emails now close in a day.",
+      "Having limited, vetted partners in key markets changed how we quote. RoRo bookings that took a week of emails now close in a day.",
     name: "Kenji Watanabe",
     role: "Director, Yokohama Auto Export",
     company: "Japan",
@@ -36,13 +36,6 @@ const testimonials = [
   },
   {
     quote:
-      "We moved 400 units in our first quarter as a member — volume we simply could not have reached working alone.",
-    name: "Ravi Fernando",
-    role: "Founder, Colombo Freight Line",
-    company: "Sri Lanka",
-  },
-  {
-    quote:
       "The annual conference alone pays for the membership. Real handshakes, real contracts, real specialists in this trade.",
     name: "Sarah Mitchell",
     role: "Commercial Director, Sydney",
@@ -56,21 +49,21 @@ const stats = [
     suffix: "+",
     label: "member countries across six continents",
     icon: AnchorIcon,
-    caption: "One trusted, vetted partner in every major market",
+    caption: "Carefully selected partners across every major automotive market",
   },
   {
     value: 15,
     suffix: "K",
     label: "vehicles moved through the network yearly",
     icon: DeliveryTruck01Icon,
-    caption: "From 2-wheelers to oversized units, door to door",
+    caption: "From vehicles and automotive cargo to complete door-to-door logistics solutions",
   },
   {
     value: 9,
     suffix: "",
     label: "years connecting automobile logistics specialists",
     icon: Airplane01Icon,
-    caption: "Secured business and maximized profits since day one",
+    caption: "Secured business, stronger partnerships, and greater global opportunities since day one",
   },
 ];
 
@@ -135,14 +128,14 @@ export function Network() {
         <Marquee slow className="[&>div]:gap-5 [&>div]:pr-5 [&>div]:items-stretch">
           {[0, 1].map((rep) =>
             testimonials
-              .slice(0, 3)
+              .slice(0, 2)
               .map((t) => <TestimonialCard key={`${t.name}-${rep}`} {...t} />),
           )}
         </Marquee>
         <Marquee slow reverse className="[&>div]:gap-5 [&>div]:pr-5 [&>div]:items-stretch">
           {[0, 1].map((rep) =>
             testimonials
-              .slice(3)
+              .slice(2)
               .map((t) => <TestimonialCard key={`${t.name}-${rep}`} {...t} />),
           )}
         </Marquee>

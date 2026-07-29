@@ -19,7 +19,7 @@ import { img, PHOTOS } from "@/lib/site";
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const points = [
-  "One qualified member per country — no internal competition",
+  "Limited, strategically selected members per country, with expanded representation in key automotive markets",
   "Experienced in local & international import/export regulation",
   "Contacts across manufacturers, carriers, customs & government",
   "Shared market intelligence and operational best practice",
@@ -122,7 +122,7 @@ export function About() {
               className="rounded-2xl border border-neutral-200 bg-white/90 px-4 py-3 shadow-lg backdrop-blur"
             >
               <p className="font-heading text-2xl font-extrabold text-brand">
-                <Counter value={12} />
+                <Counter value={9} />
               </p>
               <p className="text-xs font-medium text-neutral-500">
                 Years of trust
@@ -146,11 +146,8 @@ export function About() {
 
           <Reveal delay={0.1}>
             <p className="mt-5 text-base leading-relaxed text-neutral-600">
-              The Automobile Logistics Network membership consists of qualified,
-              experienced freight forwarders and logistics providers in each
-              major country that exports and imports automobiles. They cooperate
-              to develop business opportunities and deliver complete, end-to-end
-              solutions at low cost with a high return.
+              The Automobile Logistics Network membership consists of qualified, 
+              experienced freight forwarders and logistics providers in each major country that exports and imports automobiles, automotive spare parts, tyres, and related automotive cargo. They cooperate to develop business opportunities and deliver complete, end-to-end solutions at low cost with a high return.
             </p>
           </Reveal>
 

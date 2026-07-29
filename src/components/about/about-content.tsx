@@ -57,17 +57,17 @@ const intro = [
   {
     heading: "Qualified Specialists in every market",
     paragraphs: [
-      "The Automobile Logistics Network (ALN) membership consists of handpicked freight forwarders and logistics providers in each major country that exports and imports automobiles. They cooperate with each other to develop business opportunities among themselves in the automobile logistics industry.",
-      "ALN members are qualified and experienced in providing end-to-end logistics solutions for international and domestic automobile transportation — at a low cost with a high return, while being mutually beneficial.",
-      "ALN's policy is to have one member from each country, equipped with knowledge of local and international policies, procedures and regulations for the export and import of automobiles.",
+      "The Automobile Logistics Network (ALN) membership consists of handpicked freight forwarders and logistics providers in each major country that exports and imports automobiles, automotive spare parts, tyres, and related automotive cargo. They cooperate with each other to develop business opportunities among themselves in the automobile logistics industry.",
+      "ALN members are qualified and experienced in providing end-to-end logistics solutions for international and domestic automotive logistics — at a low cost with a high return, while being mutually beneficial.",
+      "ALN follows a selective membership model by appointing a limited number of qualified companies in each country, with expanded representation in key strategic automotive markets. This approach provides greater service coverage, specialised expertise, faster response times, and increased business opportunities while maintaining the quality and trust of the network.",
     ],
-    note: "ALN follows a selective membership model, carefully appointing a limited number of qualified companies in each country. This approach promotes stronger cooperation, meaningful business opportunities, and high-quality representation across the global automobile logistics industry.",
+    note: "Members are carefully selected based on their experience, reputation, operational capabilities, and commitment to active cooperation. This approach promotes stronger collaboration, meaningful business opportunities, and high-quality representation throughout the global automobile logistics industry.",
   },
   {
     heading: "A trade few forwarders master",
     paragraphs: [
-      "Members hold contacts with manufacturers, exporters, importers, carriers, government and non-government institutions — everything needed to provide complete logistics services for the industry. Automobile logistics is a specialised sector where few providers are involved.",
-      "It is, however, a high-revenue and profit-generating business due to the nature of its logistics complexity. Our members are strengthened by sharing operational and marketing hints, market sizes and available opportunities in their respective countries.",
+      "Members hold contacts with manufacturers, exporters, importers, carriers, government and non-government institutions — everything needed to provide complete logistics services for the industry. Automobile logistics is a specialized sector where few providers are involved.",
+      "It is, however, a high-revenue and profit-generating business due to the nature of its logistics complexity. Our members are further strengthened through business development initiatives, international networking, shared operational expertise, market intelligence, and collaboration opportunities across the global automotive industry.",
     ],
     note: null,
   },
@@ -161,9 +161,7 @@ export function AboutHeader() {
           />
           <Reveal delay={0.15}>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600">
-              Handpicked freight forwarders and logistics providers in every
-              major country that exports and imports automobiles — cooperating
-              to develop business opportunities across the industry.
+              Handpicked freight forwarders and logistics providers with carefully selected representation across major automotive markets — cooperating to develop business opportunities throughout the global automobile logistics industry.
             </p>
           </Reveal>
         </div>
@@ -188,7 +186,7 @@ export function AboutHeader() {
             </motion.div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
             <div className="absolute bottom-5 left-5 flex flex-wrap gap-2 sm:bottom-8 sm:left-8">
-              {["Est. 12 years", "42+ countries", "One partner per market"].map(
+              {["Est. 9 years", "90+ countries", "Carefully selected members"].map(
                 (chip, i) => (
                   <motion.span
                     key={chip}
@@ -221,10 +219,11 @@ const story = [
     photo: PHOTOS.carCarrier,
     alt: "Car carrier truck loaded with vehicles",
     paragraphs: [
-      "This is a global network supporting end-to-end logistics for the automobile industry — delivering brand new and used units, from 2-wheelers up to oversized automobiles, from manufacturer to end-user via road, rail, sea or air.",
+      "This is a global network supporting end-to-end logistics for the automotive industry — covering brand new and used vehicles, automotive spare parts, tyres, and related automotive cargo from manufacturer to end-user via road, rail, sea or air.",
       "An automobile is a global product that moves across every country. Manufacturers, traders, dealers and end-users look for service providers in their region — and that is exactly where the need for automobile logistics providers arises.",
-      "You may be the right partner in your country to enjoy the benefits, develop your business and become a successful stakeholder in our group. We guarantee you'll be delighted to meet members from various countries at our next conference.",
-    ],
+      "Beyond connecting members with one another, ALN actively works to create business opportunities by engaging with vehicle exporters, importers, manufacturers, dealers, and other companies across the global automotive industry, helping members expand their international reach and develop valuable business relationships.",
+      "You may be the right partner to represent your market, enjoy the benefits of ALN, develop your business, and become a successful stakeholder in our growing global community. We guarantee you'll be delighted to meet members from various countries at our next conference.",
+  ],
   },
 ];
 

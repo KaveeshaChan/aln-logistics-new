@@ -159,8 +159,7 @@ export function Services() {
             <span className="text-brand">.</span>
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-neutral-500">
-            From brand-new units to used vehicles and oversized cargo — total
-            solutions across every mode of transport, handled by specialists.
+            From brand-new and used vehicles to automotive spare parts, tyres, oversized cargo, and related automotive equipment — total logistics solutions across every mode of transport, handled by specialists.
           </p>
         </Reveal>
 

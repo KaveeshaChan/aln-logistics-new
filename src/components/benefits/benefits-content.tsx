@@ -28,8 +28,7 @@ export function BenefitsHeader() {
           />
           <Reveal delay={0.15}>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600">
-              One trusted partner per country, shared business leads and a
-              proven track record — here is what membership delivers.
+              Strategic market representation, shared business opportunities, and a proven track record — here is what membership delivers.
             </p>
           </Reveal>
         </div>

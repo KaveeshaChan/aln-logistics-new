@@ -87,9 +87,7 @@ export function Cta() {
 
           <Reveal delay={0.1}>
             <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
-              You may be the right partner in your market to enjoy the benefits,
-              grow your business and become a successful stakeholder in our
-              group. We guarantee you&apos;ll be delighted.
+              You may be the right partner in your market to enjoy the benefits, grow your business and become a successful stakeholder in our group. We guarantee you'll be delighted.
             </p>
           </Reveal>
 
@@ -133,7 +131,7 @@ export function Cta() {
 
           <Reveal delay={0.3}>
             <p className="mt-8 text-xs font-medium uppercase tracking-[0.16em] text-white/60">
-              90+ member countries · One partner per market · Protected leads
+              90+ member countries · Limited strategic market representation · Protected leads
             </p>
           </Reveal>
         </div>
