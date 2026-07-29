@@ -14,7 +14,7 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { AddMemberDialog } from "@/components/admin/add-member-dialog";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -127,6 +127,7 @@ export function NetworkMembersTable() {
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar>
+                      {member.logoUrl && <AvatarImage src={member.logoUrl} alt="" />}
                       <AvatarFallback className="bg-brand/10 text-xs font-semibold text-brand">
                         {initialsFor(member)}
                       </AvatarFallback>
@@ -184,9 +185,18 @@ export function NetworkMembersTable() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="flex size-9 items-center justify-center rounded-lg bg-neutral-50 text-neutral-300">
-                    <HugeiconsIcon icon={Image02Icon} className="size-4" />
-                  </span>
+                  {member.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- local blob preview, not a static asset
+                    <img
+                      src={member.imageUrl}
+                      alt=""
+                      className="size-9 rounded-lg object-cover ring-1 ring-black/10"
+                    />
+                  ) : (
+                    <span className="flex size-9 items-center justify-center rounded-lg bg-neutral-50 text-neutral-300">
+                      <HugeiconsIcon icon={Image02Icon} className="size-4" />
+                    </span>
+                  )}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-1">

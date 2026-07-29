@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { UserAdd01Icon } from "@hugeicons/core-free-icons";
+import { ImageUpload01Icon, UserAdd01Icon } from "@hugeicons/core-free-icons";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { countries, type CountryOption } from "@/lib/countries";
 import type { NetworkMember } from "@/lib/network-members";
+import { cn } from "@/lib/utils";
 
 const emptyForm = {
   member: "",
@@ -35,7 +36,95 @@ const emptyForm = {
   url: "",
   email: "",
   phone: "",
+  logoUrl: null as string | null,
+  imageUrl: null as string | null,
 };
+
+type FormState = typeof emptyForm;
+
+function revokePreviews(form: FormState) {
+  if (form.logoUrl) URL.revokeObjectURL(form.logoUrl);
+  if (form.imageUrl) URL.revokeObjectURL(form.imageUrl);
+}
+
+function ImageUploadField({
+  id,
+  label,
+  hint,
+  value,
+  onChange,
+  shape = "square",
+}: {
+  id: string;
+  label: string;
+  hint: string;
+  value: string | null;
+  onChange: (file: File | null) => void;
+  shape?: "circle" | "square";
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <div className="grid gap-1.5">
+      <Label htmlFor={id} className="text-neutral-700">
+        {label}
+      </Label>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className={cn(
+            "flex size-16 shrink-0 items-center justify-center overflow-hidden border border-dashed border-neutral-200 bg-neutral-50 text-neutral-400 transition-colors hover:border-brand hover:text-brand",
+            shape === "circle" ? "rounded-full" : "rounded-lg"
+          )}
+        >
+          {value ? (
+            // eslint-disable-next-line @next/next/no-img-element -- local blob preview, not a static asset
+            <img
+              src={value}
+              alt=""
+              className="size-full object-cover"
+            />
+          ) : (
+            <HugeiconsIcon icon={ImageUpload01Icon} className="size-5" />
+          )}
+        </button>
+
+        <div className="flex flex-col items-start gap-1">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="border-neutral-200 text-neutral-700 hover:bg-neutral-100"
+            onClick={() => inputRef.current?.click()}
+          >
+            {value ? "Replace" : "Upload"}
+          </Button>
+          {value ? (
+            <button
+              type="button"
+              onClick={() => onChange(null)}
+              className="text-xs text-neutral-400 hover:text-destructive"
+            >
+              Remove
+            </button>
+          ) : (
+            <p className="text-xs text-neutral-400">{hint}</p>
+          )}
+        </div>
+
+        <input
+          ref={inputRef}
+          id={id}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => onChange(e.target.files?.[0] ?? null)}
+        />
+      </div>
+    </div>
+  );
+}
 
 export function AddMemberDialog({
   onAdd,
@@ -43,11 +132,28 @@ export function AddMemberDialog({
   onAdd: (member: Omit<NetworkMember, "id">) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState<FormState>(emptyForm);
 
   const handleOpenChange = (next: boolean) => {
     setOpen(next);
-    if (!next) setForm(emptyForm);
+    if (!next) {
+      revokePreviews(form);
+      setForm(emptyForm);
+    }
+  };
+
+  const handleLogoChange = (file: File | null) => {
+    setForm((f) => {
+      if (f.logoUrl) URL.revokeObjectURL(f.logoUrl);
+      return { ...f, logoUrl: file ? URL.createObjectURL(file) : null };
+    });
+  };
+
+  const handleImageChange = (file: File | null) => {
+    setForm((f) => {
+      if (f.imageUrl) URL.revokeObjectURL(f.imageUrl);
+      return { ...f, imageUrl: file ? URL.createObjectURL(file) : null };
+    });
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -62,8 +168,13 @@ export function AddMemberDialog({
       url: form.url.trim(),
       email: form.email.trim(),
       phone: form.phone.trim(),
+      logoUrl: form.logoUrl ?? undefined,
+      imageUrl: form.imageUrl ?? undefined,
     });
-    handleOpenChange(false);
+    // Ownership of any preview object URLs now belongs to the table row —
+    // reset without revoking them.
+    setForm(emptyForm);
+    setOpen(false);
   };
 
   return (
@@ -76,7 +187,7 @@ export function AddMemberDialog({
         <HugeiconsIcon icon={UserAdd01Icon} />
         Add Member
       </DialogTrigger>
-      <DialogContent className="bg-white text-neutral-900 ring-neutral-200 sm:max-w-md">
+      <DialogContent className="max-h-[90vh] overflow-y-auto bg-white text-neutral-900 ring-neutral-200 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-base text-neutral-900">
             Add network member
@@ -87,6 +198,25 @@ export function AddMemberDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="grid gap-4">
+          <div className="grid grid-cols-2 gap-4">
+            <ImageUploadField
+              id="member-logo"
+              label="Company logo"
+              hint="PNG or JPG"
+              shape="circle"
+              value={form.logoUrl}
+              onChange={handleLogoChange}
+            />
+            <ImageUploadField
+              id="member-image"
+              label="Photo"
+              hint="PNG or JPG"
+              shape="square"
+              value={form.imageUrl}
+              onChange={handleImageChange}
+            />
+          </div>
+
           <div className="grid gap-1.5">
             <Label htmlFor="member-name" className="text-neutral-700">
               Member name
