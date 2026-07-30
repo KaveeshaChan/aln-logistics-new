@@ -137,6 +137,8 @@ export function Footer() {
                 <motion.a
                   key={s.label}
                   href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={s.label}
                   whileHover={{ y: -4, scale: 1.08 }}
                   whileTap={{ scale: 0.94 }}

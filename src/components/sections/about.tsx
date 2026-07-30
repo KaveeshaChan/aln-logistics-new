@@ -14,7 +14,6 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { Counter } from "@/components/motion/counter";
 import { Reveal } from "@/components/motion/reveal";
 import { TextReveal } from "@/components/motion/text-reveal";
-import { img, PHOTOS } from "@/lib/site";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -25,15 +24,21 @@ const points = [
   "Shared market intelligence and operational best practice",
 ];
 
+const collagePhotos = [
+  { src: "/gallery/images/DSC_9095.JPG", alt: "ALN members at the ALN Annual Conference 2023" },
+  { src: "/gallery/images/DSC_9145.JPG", alt: "An ALN member at the ALN Annual Conference 2023" },
+  { src: "/gallery/images/DSC_9220.JPG", alt: "An ALN member at the ALN Annual Conference 2023" },
+  { src: "/gallery/images/DSC_9110.JPG", alt: "ALN members at the ALN Annual Conference 2023" },
+];
+
 export function About() {
   const collageRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: collageRef,
     offset: ["start end", "end start"],
   });
-  // Gentle counter-scroll parallax: main image drifts up, inset card drifts down
+  // Gentle counter-scroll parallax as the collage scrolls through view
   const mainY = useTransform(scrollYProgress, [0, 1], [40, -40]);
-  const cardY = useTransform(scrollYProgress, [0, 1], [-24, 24]);
 
   return (
     <section id="about" className="relative overflow-hidden py-24 sm:py-32 bg-white text-black">
@@ -46,42 +51,29 @@ export function About() {
       <div className="mx-auto grid max-w-6xl gap-16 px-5 sm:px-8 lg:grid-cols-2 lg:items-center">
         {/* Image collage */}
         <div ref={collageRef} className="relative order-2 lg:order-1">
-          <Reveal direction="right" className="relative">
-            <motion.div style={{ y: mainY }}>
-              <div className="group relative aspect-[4/5] overflow-hidden rounded-[2rem] shadow-2xl shadow-neutral-200/60">
-                <Image
-                  src={img(PHOTOS.shipRamp, 900, 70)}
-                  alt="Vehicles being driven onto a RoRo vessel"
-                  fill
-                  sizes="(max-width: 1024px) 90vw, 460px"
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                />
-                {/* Sheen sweep on hover */}
-                <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-full" />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
-              </div>
+          <Reveal direction="right">
+            <motion.div style={{ y: mainY }} className="grid grid-cols-2 gap-4">
+              {collagePhotos.map((photo, i) => (
+                <div
+                  key={photo.src}
+                  className={`group relative aspect-square overflow-hidden rounded-2xl shadow-xl shadow-neutral-200/60 ${
+                    i % 2 === 1 ? "mt-8" : ""
+                  }`}
+                >
+                  <Image
+                    src={photo.src}
+                    alt={photo.alt}
+                    fill
+                    sizes="(max-width: 1024px) 45vw, 220px"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                  {/* Sheen sweep on hover */}
+                  <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-full" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+                </div>
+              ))}
             </motion.div>
           </Reveal>
-
-          <motion.div
-            style={{ y: cardY }}
-            initial={{ opacity: 0, y: 30, rotate: 3 }}
-            whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-            whileHover={{ scale: 1.04, rotate: -1 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7, delay: 0.2, ease }}
-            className="absolute -bottom-8 -right-2 w-44 overflow-hidden rounded-2xl border-4 border-white shadow-xl sm:w-56"
-          >
-            <div className="relative aspect-square">
-              <Image
-                src={img(PHOTOS.carSingle, 500, 60)}
-                alt="A single vehicle prepared for transport"
-                fill
-                sizes="224px"
-                className="object-cover"
-              />
-            </div>
-          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, x: -24 }}

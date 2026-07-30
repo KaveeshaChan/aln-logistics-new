@@ -176,8 +176,8 @@ export function AboutHeader() {
           >
             <motion.div style={{ y: imageY }} className="absolute -inset-y-[14%] inset-x-0">
               <Image
-                src={img(PHOTOS.heroPort, 1800, 70)}
-                alt="Container port with cranes loading vehicles"
+                src="/gallery/images/shutterstock_2520827487.jpg"
+                alt="Car carrier truck loaded with vehicles for transport"
                 fill
                 priority
                 sizes="(max-width: 1280px) 100vw, 1216px"

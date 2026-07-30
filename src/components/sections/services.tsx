@@ -86,7 +86,7 @@ function ServiceRow({
                 className="group/img relative aspect-[4/3] overflow-hidden rounded-2xl"
               >
                 <Image
-                  src={img(service.photo, 700, 65)}
+                  src={service.photo.startsWith("/") ? service.photo : img(service.photo, 700, 65)}
                   alt={service.title}
                   fill
                   sizes="(max-width: 640px) 90vw, 300px"

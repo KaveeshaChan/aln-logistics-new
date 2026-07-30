@@ -175,6 +175,8 @@ function InfoCards() {
               <motion.a
                 key={social.label}
                 href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label={social.label}
                 whileHover={{ y: -3, scale: 1.08 }}
                 whileTap={{ scale: 0.94 }}

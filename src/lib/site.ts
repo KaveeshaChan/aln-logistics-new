@@ -83,7 +83,7 @@ export const services = [
     title: "Ocean & Ro-Ro Shipping",
     description:
       "End-to-end sea freight for brand new and used units — from single vehicles to full RoRo and container loads across every major trade lane.",
-    photo: PHOTOS.shipRamp,
+    photo: "/gallery/images/Ocean & Ro-Ro Shipping.png",
     tags: [
       "RoRo vessels",
       "Container loads",
@@ -110,7 +110,7 @@ export const services = [
     title: "Air Freight & Express",
     description:
       "Time-critical automotive parts and high-value units flown worldwide with prioritized customs clearance.",
-    photo: PHOTOS.containers,
+    photo: "/gallery/images/Air Freight & Express.png",
     tags: [
       "Time-critical",
       "High-value units",
@@ -123,7 +123,7 @@ export const services = [
     title: "Warehousing & PDI",
     description:
       "Secure yard storage, pre-delivery inspection and value-added handling managed by trusted local specialists.",
-    photo: PHOTOS.warehouse,
+    photo: "/gallery/images/Warehousing & PDI.png",
     tags: [
       "Yard storage",
       "Pre-delivery inspection",
@@ -387,10 +387,26 @@ export const footerLinks = {
 } as const;
 
 export const socials = [
-  { icon: Facebook01Icon, href: "#", label: "Facebook" },
-  { icon: InstagramIcon, href: "#", label: "Instagram" },
-  { icon: Linkedin01Icon, href: "#", label: "LinkedIn" },
-  { icon: YoutubeIcon, href: "#", label: "YouTube" },
+  {
+    icon: Facebook01Icon,
+    href: "https://www.facebook.com/share/1ERvcJhuSo/",
+    label: "Facebook",
+  },
+  {
+    icon: InstagramIcon,
+    href: "https://www.instagram.com/auto.logistics.network?igsh=czlqNW84cWhxdmk4",
+    label: "Instagram",
+  },
+  {
+    icon: Linkedin01Icon,
+    href: "https://www.linkedin.com/company/automobile-logistics-network/",
+    label: "LinkedIn",
+  },
+  {
+    icon: YoutubeIcon,
+    href: "https://www.youtube.com/@automobilelogisticsnetwork",
+    label: "YouTube",
+  },
 ] as const;
 
 export const contactIcons = { Location01Icon, Call02Icon, Mail01Icon };
