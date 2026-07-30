@@ -60,7 +60,7 @@ function initialsFor(member: NetworkMember) {
   return initials || "—";
 }
 
-export function NetworkMembersTable() {
+export function NetworkMembersTable({ readOnly = false }: { readOnly?: boolean } = {}) {
   const [members, setMembers] = useState<NetworkMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -160,6 +160,8 @@ export function NetworkMembersTable() {
     return filtered.slice(start, start + pageSize);
   }, [filtered, currentPage, pageSize]);
 
+  const columnCount = readOnly ? 5 : 6;
+
   return (
     <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white text-neutral-900 shadow-sm shadow-neutral-200/50">
       <div className="flex flex-col gap-3 border-b border-neutral-100 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -187,7 +189,7 @@ export function NetworkMembersTable() {
               className="h-9 rounded-full pl-9 text-sm"
             />
           </div>
-          <AddMemberDialog onAdd={handleAdd} />
+          {readOnly ? null : <AddMemberDialog onAdd={handleAdd} />}
         </div>
       </div>
 
@@ -205,13 +207,15 @@ export function NetworkMembersTable() {
             <TableHead className="text-neutral-400">Company Details</TableHead>
             <TableHead className="text-neutral-400">Contact Details</TableHead>
             <TableHead className="text-neutral-400">Images</TableHead>
-            <TableHead className="text-right text-neutral-400">Actions</TableHead>
+            {readOnly ? null : (
+              <TableHead className="text-right text-neutral-400">Actions</TableHead>
+            )}
           </TableRow>
         </TableHeader>
         <TableBody>
           {loading ? (
             <TableRow className="hover:bg-transparent">
-              <TableCell colSpan={6} className="h-32 text-center text-neutral-400">
+              <TableCell colSpan={columnCount} className="h-32 text-center text-neutral-400">
                 Loading members...
               </TableCell>
             </TableRow>
@@ -295,55 +299,57 @@ export function NetworkMembersTable() {
                     </span>
                   )}
                 </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <AddMemberDialog member={member} onSave={handleSave} />
-                    <AlertDialog>
-                      <AlertDialogTrigger
-                        render={
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            type="button"
-                            className="rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive"
-                          />
-                        }
-                      >
-                        <HugeiconsIcon icon={Delete02Icon} />
-                        <span className="sr-only">
-                          Delete {member.member || member.company}
-                        </span>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-white text-neutral-900 ring-neutral-200 sm:max-w-sm">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="text-base text-neutral-900">
-                            Delete network member
-                          </AlertDialogTitle>
-                          <AlertDialogDescription className="text-neutral-500">
-                            This will remove{" "}
-                            <strong className="font-semibold text-neutral-700">
-                              {member.member || member.company}
-                            </strong>{" "}
-                            from the network directory. This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDelete(member.id)}
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </TableCell>
+                {readOnly ? null : (
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <AddMemberDialog member={member} onSave={handleSave} />
+                      <AlertDialog>
+                        <AlertDialogTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              type="button"
+                              className="rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            />
+                          }
+                        >
+                          <HugeiconsIcon icon={Delete02Icon} />
+                          <span className="sr-only">
+                            Delete {member.member || member.company}
+                          </span>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-white text-neutral-900 ring-neutral-200 sm:max-w-sm">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="text-base text-neutral-900">
+                              Delete network member
+                            </AlertDialogTitle>
+                            <AlertDialogDescription className="text-neutral-500">
+                              This will remove{" "}
+                              <strong className="font-semibold text-neutral-700">
+                                {member.member || member.company}
+                              </strong>{" "}
+                              from the network directory. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(member.id)}
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </TableCell>
+                )}
               </TableRow>
             ))
           ) : (
             <TableRow className="hover:bg-transparent">
-              <TableCell colSpan={6} className="h-32 text-center text-neutral-400">
+              <TableCell colSpan={columnCount} className="h-32 text-center text-neutral-400">
                 No members found.
               </TableCell>
             </TableRow>

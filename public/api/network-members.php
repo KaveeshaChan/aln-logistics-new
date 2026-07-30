@@ -4,13 +4,16 @@
  * network directory (src/components/admin/network-members-table.tsx).
  * Replaces the previous hardcoded src/lib/network-members.ts array.
  *
- * All methods require an authenticated Admin session, matching the
- * Admin-only gate around this table in account-content.tsx.
+ * GET    — list all members (any authenticated user — Admin or User)
+ * POST   — create a member (Admin only)
+ * PUT    — update a member by id (Admin only)
+ * DELETE — delete a member by id (Admin only)
  *
- * GET    — list all members
- * POST   — create a member
- * PUT    — update a member by id
- * DELETE — delete a member by id
+ * The User role gets read-only access: account-content.tsx renders
+ * NetworkMembersTable with readOnly for non-Admins, which hides the Add
+ * Member button and the per-row edit/delete actions client-side — but the
+ * write methods below re-check the role server-side too, since a client-side
+ * hide is not real access control.
  */
 
 declare(strict_types=1);
@@ -73,7 +76,7 @@ $pdo = aln_db();
 $method = $_SERVER["REQUEST_METHOD"];
 
 if ($method === "GET") {
-    aln_require_admin();
+    aln_require_user();
 
     $stmt = $pdo->query("SELECT * FROM network_members ORDER BY id ASC");
     $members = array_map("aln_row_to_member", $stmt->fetchAll());

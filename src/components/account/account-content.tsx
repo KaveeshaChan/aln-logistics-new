@@ -1,17 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  Logout03Icon,
-  ShieldUserIcon,
-  UserIcon,
-} from "@hugeicons/core-free-icons";
+import { useEffect } from "react";
 import { motion } from "motion/react";
 
 import { NetworkMembersTable } from "@/components/admin/network-members-table";
 import { useAuth } from "@/lib/auth-context";
-import { cn } from "@/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -21,20 +14,13 @@ const ease = [0.22, 1, 0.36, 1] as const;
  * HTML shell always loads, this component decides what to show inside it.
  */
 export function AccountContent() {
-  const { user, loading, logout } = useAuth();
-  const [loggingOut, setLoggingOut] = useState(false);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     if (!loading && !user) {
       window.location.href = "/login/";
     }
   }, [loading, user]);
-
-  const handleLogout = async () => {
-    setLoggingOut(true);
-    await logout();
-    window.location.href = "/login/";
-  };
 
   if (loading || !user) {
     return (
@@ -48,75 +34,21 @@ export function AccountContent() {
     );
   }
 
+  // Admin and User share this same view — the table itself decides what to
+  // show based on readOnly (Add Member button, edit/delete actions).
   const isAdmin = user.role === "Admin";
-
-  if (isAdmin) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, ease }}
-        className="w-full"
-      >
-        <h3 className="mb-4 font-heading text-xl font-extrabold tracking-tight text-neutral-900">
-          Network Members
-        </h3>
-        <NetworkMembersTable />
-      </motion.div>
-    );
-  }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, ease }}
-      className="mx-auto max-w-xl rounded-[2rem] border border-neutral-200 bg-white p-8 shadow-xl shadow-neutral-200/60 sm:p-10"
+      className="w-full"
     >
-      <div className="flex items-center gap-4">
-        <span
-          className={cn(
-            "grid size-14 shrink-0 place-items-center rounded-full",
-            isAdmin ? "bg-brand/10 text-brand" : "bg-neutral-100 text-neutral-500",
-          )}
-        >
-          <HugeiconsIcon icon={isAdmin ? ShieldUserIcon : UserIcon} size={26} />
-        </span>
-        <div>
-          <h2 className="font-heading text-2xl font-extrabold tracking-tight text-neutral-900">
-            Welcome, {user.username}
-          </h2>
-          <span
-            className={cn(
-              "mt-1 inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-semibold",
-              isAdmin
-                ? "bg-brand/10 text-brand"
-                : "bg-neutral-100 text-neutral-600",
-            )}
-          >
-            {user.role}
-          </span>
-        </div>
-      </div>
-
-      <p className="mt-6 text-sm leading-relaxed text-neutral-600">
-        {isAdmin
-          ? "You're signed in with administrator access to the ALN member portal."
-          : "You're signed in with member access to the ALN member portal."}
-      </p>
-
-      <motion.button
-        type="button"
-        onClick={handleLogout}
-        disabled={loggingOut}
-        whileHover={loggingOut ? undefined : { scale: 1.02, y: -2 }}
-        whileTap={loggingOut ? undefined : { scale: 0.98 }}
-        transition={{ type: "spring", stiffness: 320, damping: 20 }}
-        className="group mt-8 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-neutral-200 bg-white text-sm font-semibold text-neutral-700 transition-colors duration-300 hover:border-neutral-300 hover:text-neutral-900 disabled:cursor-not-allowed disabled:opacity-70"
-      >
-        {loggingOut ? "Logging out..." : "Log out"}
-        <HugeiconsIcon icon={Logout03Icon} size={16} />
-      </motion.button>
+      <h3 className="mb-4 font-heading text-xl font-extrabold tracking-tight text-neutral-900">
+        Network Members
+      </h3>
+      <NetworkMembersTable readOnly={!isAdmin} />
     </motion.div>
   );
 }
