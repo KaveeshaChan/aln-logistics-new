@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowLeft01Icon,
@@ -35,9 +35,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { networkMembers as initialMembers, type NetworkMember } from "@/lib/network-members";
+import type { NetworkMember } from "@/lib/network-members";
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
+
+async function parseJsonError(res: Response, fallback: string): Promise<string> {
+  try {
+    const data = await res.json();
+    return typeof data?.error === "string" ? data.error : fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 function initialsFor(member: NetworkMember) {
   const source = member.member || member.company;
@@ -52,28 +61,84 @@ function initialsFor(member: NetworkMember) {
 }
 
 export function NetworkMembersTable() {
-  const [members, setMembers] = useState<NetworkMember[]>(initialMembers);
+  const [members, setMembers] = useState<NetworkMember[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
-  const handleAdd = (newMember: Omit<NetworkMember, "id">) => {
-    setMembers((prev) => {
-      const nextId = prev.reduce((max, m) => Math.max(max, m.id), 0) + 1;
-      return [{ ...newMember, id: nextId }, ...prev];
-    });
-    setSearch("");
-    setPageIndex(0);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/network-members.php", { credentials: "same-origin" })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(await parseJsonError(res, "Failed to load members."));
+        return res.json();
+      })
+      .then((data) => {
+        if (!cancelled) setMembers(data.members ?? []);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load members.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleAdd = async (newMember: Omit<NetworkMember, "id">) => {
+    setError(null);
+    try {
+      const res = await fetch("/api/network-members.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify(newMember),
+      });
+      if (!res.ok) throw new Error(await parseJsonError(res, "Failed to add member."));
+      const data = await res.json();
+      setMembers((prev) => [data.member, ...prev]);
+      setSearch("");
+      setPageIndex(0);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add member.");
+    }
   };
 
-  const handleSave = (updated: NetworkMember) => {
-    setMembers((prev) =>
-      prev.map((m) => (m.id === updated.id ? updated : m))
-    );
+  const handleSave = async (updated: NetworkMember) => {
+    setError(null);
+    try {
+      const res = await fetch("/api/network-members.php", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify(updated),
+      });
+      if (!res.ok) throw new Error(await parseJsonError(res, "Failed to save member."));
+      const data = await res.json();
+      setMembers((prev) => prev.map((m) => (m.id === data.member.id ? data.member : m)));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save member.");
+    }
   };
 
-  const handleDelete = (id: number) => {
-    setMembers((prev) => prev.filter((m) => m.id !== id));
+  const handleDelete = async (id: number) => {
+    setError(null);
+    try {
+      const res = await fetch("/api/network-members.php", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) throw new Error(await parseJsonError(res, "Failed to delete member."));
+      setMembers((prev) => prev.filter((m) => m.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete member.");
+    }
   };
 
   const filtered = useMemo(() => {
@@ -126,6 +191,12 @@ export function NetworkMembersTable() {
         </div>
       </div>
 
+      {error ? (
+        <p className="border-b border-red-100 bg-red-50 px-4 py-2 text-xs text-red-600">
+          {error}
+        </p>
+      ) : null}
+
       <Table>
         <TableHeader>
           <TableRow className="border-neutral-100 bg-neutral-50/70 hover:bg-neutral-50/70">
@@ -138,7 +209,13 @@ export function NetworkMembersTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.length ? (
+          {loading ? (
+            <TableRow className="hover:bg-transparent">
+              <TableCell colSpan={6} className="h-32 text-center text-neutral-400">
+                Loading members...
+              </TableCell>
+            </TableRow>
+          ) : rows.length ? (
             rows.map((member) => (
               <TableRow
                 key={member.id}

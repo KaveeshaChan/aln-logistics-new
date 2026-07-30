@@ -17,3 +17,24 @@ CREATE TABLE IF NOT EXISTS users (
 --
 -- INSERT INTO users (username, password, role)
 -- VALUES ('admin', '$2y$10$replace-with-a-real-hash', 'Admin');
+
+-- Network directory shown on the Admin account dashboard
+-- (src/components/admin/network-members-table.tsx), served by
+-- public/api/network-members.php instead of a hardcoded TS array.
+CREATE TABLE IF NOT EXISTS network_members (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  member VARCHAR(150) NOT NULL DEFAULT '',
+  country VARCHAR(100) NOT NULL,
+  country_code CHAR(2) NOT NULL,
+  company VARCHAR(200) NOT NULL,
+  url VARCHAR(255) NOT NULL DEFAULT '',
+  email VARCHAR(150) NOT NULL DEFAULT '',
+  phone VARCHAR(50) NOT NULL DEFAULT '',
+  logo_url VARCHAR(500) DEFAULT NULL,
+  image_url VARCHAR(500) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- After creating this table, run database/seed-network-members.sql once to
+-- load the existing directory (89 rows, converted from the previous
+-- src/lib/network-members.ts) into it.
