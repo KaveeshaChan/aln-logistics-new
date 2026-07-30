@@ -83,6 +83,7 @@ function PlayerModal({
               ) : video.src ? (
                 <video
                   src={video.src}
+                  poster={"poster" in video ? video.poster : undefined}
                   controls
                   autoPlay
                   playsInline
@@ -216,13 +217,24 @@ function VideoCard({
       className="group relative block aspect-[4/3] w-full overflow-hidden rounded-2xl bg-neutral-100 text-left outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
       aria-label={`Play ${video.title}`}
     >
-      <Image
-        src={video.poster}
-        alt=""
-        fill
-        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-        className="object-cover transition-transform duration-700 group-hover:scale-110"
-      />
+      {video.src ? (
+        <video
+          src={`${video.src}#t=${video.posterTime ?? 0.1}`}
+          poster={video.poster}
+          muted
+          playsInline
+          preload="metadata"
+          className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-110"
+        />
+      ) : (
+        <Image
+          src={video.poster}
+          alt=""
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="object-cover transition-transform duration-700 group-hover:scale-110"
+        />
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" />
 
       <span className="absolute right-3 top-3 rounded-full bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white/90 backdrop-blur">

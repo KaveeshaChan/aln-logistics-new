@@ -12,11 +12,13 @@ import { img } from "@/lib/site";
 /**
  * Gallery content model.
  *
- * All content here — webinar flyers, achievement photos/videos and the real
- * shipment/meeting photos — comes from the actual ALN media in
- * `public/gallery/`, mirroring the legacy autologisticsnetwork.com gallery
- * pages. Only the Videos page (19 country clips) still has no source footage
- * to host, so it keeps curated placeholder imagery until real clips exist.
+ * All content here — webinar flyers, achievement photos/videos, the real
+ * shipment/meeting photos and the 19 country video clips — comes from the
+ * actual ALN media in `public/gallery/`, mirroring the legacy
+ * autologisticsnetwork.com gallery pages. The `poster` on each country video
+ * is still a stock photo (used as the <video> poster attribute and as the
+ * modal fallback if a clip ever goes missing) since a matching still wasn't
+ * cut from the footage.
  */
 
 /** Encodes a filename (which may contain spaces/parens) into a public URL. */
@@ -287,6 +289,8 @@ export interface Video {
   youtubeId?: string;
   /** Local file under `public/`, for self-hosted clips. */
   src?: string;
+  /** Seconds into `src` to seek for the grid thumbnail frame (skips any intro slate). */
+  posterTime?: number;
   poster: string;
   featured?: boolean;
 }
@@ -307,26 +311,58 @@ const posters = [
   "photo-1578575437130-527eed3abbec",
 ];
 
-const rawVideos: { title: string; region: VideoRegion }[] = [
-  { title: "ALN - Maldives", region: "Asia" },
-  { title: "ALN - Australia", region: "Oceania" },
-  { title: "ALN - Fiji", region: "Oceania" },
-  { title: "ALN - Indonesia", region: "Asia" },
-  { title: "ALN - Japan", region: "Asia" },
-  { title: "ALN - Kenya", region: "Africa" },
-  { title: "ALN - Malaysia", region: "Asia" },
-  { title: "ALN - Nigeria", region: "Africa" },
-  { title: "ALN Participants - Pakistan", region: "Asia" },
-  { title: "ALN Participants - UK", region: "Europe" },
-  { title: "ALN - Qatar", region: "Middle East" },
-  { title: "ALN - Russia", region: "Europe" },
-  { title: "ALN - South Africa", region: "Africa" },
-  { title: "ALN - South Korea", region: "Asia" },
-  { title: "ALN - Spain", region: "Europe" },
-  { title: "ALN - Taiwan", region: "Asia" },
-  { title: "ALN - Tanzania", region: "Africa" },
-  { title: "ALN - Thailand", region: "Asia" },
-  { title: "ALN - UAE", region: "Middle East" },
+const rawVideos: {
+  title: string;
+  region: VideoRegion;
+  file: string;
+  posterTime?: number;
+}[] = [
+  { title: "ALN - Maldives", region: "Asia", file: "ALN Maldives final.mp4" },
+  { title: "ALN - Australia", region: "Oceania", file: "ALN Australia Final.mp4" },
+  { title: "ALN - Fiji", region: "Oceania", file: "ALN Fiji - Final.mp4" },
+  { title: "ALN - Indonesia", region: "Asia", file: "ALN Indonesia - Final.mp4" },
+  {
+    title: "ALN - Japan",
+    region: "Asia",
+    file: "ALN Japan Final for Approval Final.mp4",
+  },
+  { title: "ALN - Kenya", region: "Africa", file: "ALN Kenya Final.mp4" },
+  // This export is a much lower-bitrate proxy than the others and goes black
+  // past the first second or two, so it can't use the shared 16s offset.
+  {
+    title: "ALN - Malaysia",
+    region: "Asia",
+    file: "ALN Malaysia Final.mp4",
+    posterTime: 1,
+  },
+  { title: "ALN - Nigeria", region: "Africa", file: "ALN NIgeria Final.mp4" },
+  {
+    title: "ALN Participants - Pakistan",
+    region: "Asia",
+    file: "ALN Participants - Pakistan Final.mp4",
+  },
+  {
+    title: "ALN Participants - UK",
+    region: "Europe",
+    file: "ALN Participants - Uk Final.mp4",
+  },
+  { title: "ALN - Qatar", region: "Middle East", file: "ALN Qatar Final.mp4" },
+  { title: "ALN - Russia", region: "Europe", file: "ALN Russia - Final.mp4" },
+  {
+    title: "ALN - South Africa",
+    region: "Africa",
+    file: "ALN South Africa Final.mp4",
+  },
+  {
+    title: "ALN - South Korea",
+    region: "Asia",
+    file: "ALN South Korea - Final.mp4",
+  },
+  { title: "ALN - Spain", region: "Europe", file: "ALN Spain - Final.mp4" },
+  { title: "ALN - Taiwan", region: "Asia", file: "ALN taiwan - Final.mp4" },
+  { title: "ALN - Tanzania", region: "Africa", file: "ALN Tanzania - Final.mp4" },
+  { title: "ALN - Thailand", region: "Asia", file: "ALN Thailand Final.mp4" },
+  { title: "ALN - UAE", region: "Middle East", file: "ALN UAE Final.mp4" },
 ];
 
 /** Real ALN clips hosted on YouTube — shown as the featured strip above the country grid. */
@@ -374,6 +410,10 @@ export const videos: Video[] = rawVideos.map((v, i) => ({
   id: v.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
   title: v.title,
   region: v.region,
+  src: gimg("videos/vid", v.file),
+  // Every clip opens with the same ~15s "ALN Annual Conference" intro slate —
+  // seek past it so the grid thumbnail shows the member on camera instead.
+  posterTime: v.posterTime ?? 16,
   poster: img(posters[i % posters.length], 1000, 70),
 }));
 
