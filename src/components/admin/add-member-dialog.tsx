@@ -2,7 +2,7 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ImageUpload01Icon, UserAdd01Icon } from "@hugeicons/core-free-icons";
+import { Edit02Icon, ImageUpload01Icon, UserAdd01Icon } from "@hugeicons/core-free-icons";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -42,9 +42,23 @@ const emptyForm = {
 
 type FormState = typeof emptyForm;
 
-function revokePreviews(form: FormState) {
-  if (form.logoUrl) URL.revokeObjectURL(form.logoUrl);
-  if (form.imageUrl) URL.revokeObjectURL(form.imageUrl);
+function formFromMember(member?: NetworkMember): FormState {
+  if (!member) return emptyForm;
+  const country =
+    countries.find((c) => c.code === member.countryCode) ?? {
+      code: member.countryCode,
+      name: member.country,
+    };
+  return {
+    member: member.member,
+    country,
+    company: member.company,
+    url: member.url,
+    email: member.email,
+    phone: member.phone,
+    logoUrl: member.logoUrl ?? null,
+    imageUrl: member.imageUrl ?? null,
+  };
 }
 
 function ImageUploadField({
@@ -127,32 +141,56 @@ function ImageUploadField({
 }
 
 export function AddMemberDialog({
+  member,
   onAdd,
+  onSave,
 }: {
-  onAdd: (member: Omit<NetworkMember, "id">) => void;
+  member?: NetworkMember;
+  onAdd?: (member: Omit<NetworkMember, "id">) => void;
+  onSave?: (member: NetworkMember) => void;
 }) {
+  const isEdit = Boolean(member);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<FormState>(emptyForm);
+  const [form, setForm] = useState<FormState>(() => formFromMember(member));
+  // Object URLs created by this dialog instance that haven't been handed off
+  // to a caller yet — only these are safe to revoke on cancel/replace, since
+  // an edit's original logoUrl/imageUrl may still be in use by the table row.
+  const pendingBlobUrls = useRef<Set<string>>(new Set());
 
   const handleOpenChange = (next: boolean) => {
     setOpen(next);
-    if (!next) {
-      revokePreviews(form);
+    if (next) {
+      setForm(formFromMember(member));
+    } else {
+      pendingBlobUrls.current.forEach((url) => URL.revokeObjectURL(url));
+      pendingBlobUrls.current.clear();
       setForm(emptyForm);
     }
   };
 
   const handleLogoChange = (file: File | null) => {
     setForm((f) => {
-      if (f.logoUrl) URL.revokeObjectURL(f.logoUrl);
-      return { ...f, logoUrl: file ? URL.createObjectURL(file) : null };
+      if (f.logoUrl && pendingBlobUrls.current.has(f.logoUrl)) {
+        URL.revokeObjectURL(f.logoUrl);
+        pendingBlobUrls.current.delete(f.logoUrl);
+      }
+      if (!file) return { ...f, logoUrl: null };
+      const url = URL.createObjectURL(file);
+      pendingBlobUrls.current.add(url);
+      return { ...f, logoUrl: url };
     });
   };
 
   const handleImageChange = (file: File | null) => {
     setForm((f) => {
-      if (f.imageUrl) URL.revokeObjectURL(f.imageUrl);
-      return { ...f, imageUrl: file ? URL.createObjectURL(file) : null };
+      if (f.imageUrl && pendingBlobUrls.current.has(f.imageUrl)) {
+        URL.revokeObjectURL(f.imageUrl);
+        pendingBlobUrls.current.delete(f.imageUrl);
+      }
+      if (!file) return { ...f, imageUrl: null };
+      const url = URL.createObjectURL(file);
+      pendingBlobUrls.current.add(url);
+      return { ...f, imageUrl: url };
     });
   };
 
@@ -160,7 +198,7 @@ export function AddMemberDialog({
     e.preventDefault();
     if (!form.country) return;
 
-    onAdd({
+    const payload = {
       member: form.member.trim(),
       country: form.country.name,
       countryCode: form.country.code,
@@ -170,9 +208,17 @@ export function AddMemberDialog({
       phone: form.phone.trim(),
       logoUrl: form.logoUrl ?? undefined,
       imageUrl: form.imageUrl ?? undefined,
-    });
-    // Ownership of any preview object URLs now belongs to the table row —
-    // reset without revoking them.
+    };
+
+    // Ownership of any preview object URLs now belongs to the caller —
+    // clear the pending set so close doesn't revoke them.
+    pendingBlobUrls.current.clear();
+
+    if (isEdit && member) {
+      onSave?.({ ...payload, id: member.id });
+    } else {
+      onAdd?.(payload);
+    }
     setForm(emptyForm);
     setOpen(false);
   };
@@ -181,19 +227,40 @@ export function AddMemberDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger
         render={
-          <Button className="gap-1.5 rounded-full bg-brand text-white hover:bg-brand/90" />
+          isEdit ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-lg text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900"
+            />
+          ) : (
+            <Button className="gap-1.5 rounded-full bg-brand text-white hover:bg-brand/90" />
+          )
         }
       >
-        <HugeiconsIcon icon={UserAdd01Icon} />
-        Add Member
+        {isEdit ? (
+          <>
+            <HugeiconsIcon icon={Edit02Icon} />
+            <span className="sr-only">
+              Edit {member?.member || member?.company}
+            </span>
+          </>
+        ) : (
+          <>
+            <HugeiconsIcon icon={UserAdd01Icon} />
+            Add Member
+          </>
+        )}
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto bg-white text-neutral-900 ring-neutral-200 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-base text-neutral-900">
-            Add network member
+            {isEdit ? "Edit network member" : "Add network member"}
           </DialogTitle>
           <DialogDescription className="text-neutral-500">
-            Add a new logistics partner to the network directory.
+            {isEdit
+              ? "Update this logistics partner's directory details."
+              : "Add a new logistics partner to the network directory."}
           </DialogDescription>
         </DialogHeader>
 
@@ -245,6 +312,7 @@ export function AddMemberDialog({
                 setForm((f) => ({ ...f, country: value }))
               }
               itemToStringValue={(c: CountryOption) => c.name}
+              itemToStringLabel={(c: CountryOption) => c.name}
             >
               <ComboboxInput
                 id="country-input"
@@ -340,7 +408,7 @@ export function AddMemberDialog({
               type="submit"
               className="bg-brand text-white hover:bg-brand/90"
             >
-              Add member
+              {isEdit ? "Save changes" : "Add member"}
             </Button>
           </DialogFooter>
         </form>

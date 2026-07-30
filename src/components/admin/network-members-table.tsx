@@ -8,12 +8,22 @@ import {
   ArrowRight01Icon,
   ArrowRightDoubleIcon,
   Delete02Icon,
-  Edit02Icon,
   Image02Icon,
   Search01Icon,
 } from "@hugeicons/core-free-icons";
 
 import { AddMemberDialog } from "@/components/admin/add-member-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,6 +64,16 @@ export function NetworkMembersTable() {
     });
     setSearch("");
     setPageIndex(0);
+  };
+
+  const handleSave = (updated: NetworkMember) => {
+    setMembers((prev) =>
+      prev.map((m) => (m.id === updated.id ? updated : m))
+    );
+  };
+
+  const handleDelete = (id: number) => {
+    setMembers((prev) => prev.filter((m) => m.id !== id));
   };
 
   const filtered = useMemo(() => {
@@ -200,24 +220,46 @@ export function NetworkMembersTable() {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      type="button"
-                      className="rounded-lg text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900"
-                    >
-                      <HugeiconsIcon icon={Edit02Icon} />
-                      <span className="sr-only">Edit {member.member || member.company}</span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      type="button"
-                      className="rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    >
-                      <HugeiconsIcon icon={Delete02Icon} />
-                      <span className="sr-only">Delete {member.member || member.company}</span>
-                    </Button>
+                    <AddMemberDialog member={member} onSave={handleSave} />
+                    <AlertDialog>
+                      <AlertDialogTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            type="button"
+                            className="rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          />
+                        }
+                      >
+                        <HugeiconsIcon icon={Delete02Icon} />
+                        <span className="sr-only">
+                          Delete {member.member || member.company}
+                        </span>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-white text-neutral-900 ring-neutral-200 sm:max-w-sm">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="text-base text-neutral-900">
+                            Delete network member
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className="text-neutral-500">
+                            This will remove{" "}
+                            <strong className="font-semibold text-neutral-700">
+                              {member.member || member.company}
+                            </strong>{" "}
+                            from the network directory. This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(member.id)}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </TableCell>
               </TableRow>
