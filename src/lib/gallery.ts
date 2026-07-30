@@ -320,12 +320,43 @@ const rawVideos: { title: string; region: VideoRegion }[] = [
   { title: "ALN - UAE", region: "Middle East" },
 ];
 
+/** Real ALN clips hosted on YouTube — shown as the featured strip above the country grid. */
+const featuredRawVideos: {
+  title: string;
+  region: VideoRegion;
+  youtubeId: string;
+}[] = [
+  {
+    title: "R Rak Storage Procedure - ALN",
+    region: "Middle East",
+    youtubeId: "pSwcn8Ht7ww",
+  },
+  {
+    title: "ALN | United Kingdom Member Auto Box Logistics (Pvt) Ltd",
+    region: "Europe",
+    youtubeId: "hxrsjXypCmc",
+  },
+  {
+    title: "ALN Sri Lanka Member | Clarion Logistics (Pvt) Ltd",
+    region: "Asia",
+    youtubeId: "UGfTU4sVhKI",
+  },
+];
+
+export const featuredVideos: Video[] = featuredRawVideos.map((v) => ({
+  id: v.youtubeId,
+  title: v.title,
+  region: v.region,
+  youtubeId: v.youtubeId,
+  poster: `https://i.ytimg.com/vi/${v.youtubeId}/maxresdefault.jpg`,
+  featured: true,
+}));
+
 export const videos: Video[] = rawVideos.map((v, i) => ({
   id: v.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
   title: v.title,
   region: v.region,
   poster: img(posters[i % posters.length], 1000, 70),
-  featured: i === 4, // ALN - Japan
 }));
 
 export const videoRegions: VideoRegion[] = [

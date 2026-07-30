@@ -7,7 +7,13 @@ import { AnimatePresence, motion } from "motion/react";
 
 import { CategoryTabs } from "@/components/gallery/category-tabs";
 import { Reveal } from "@/components/motion/reveal";
-import { videoRegions, videos, type Video, type VideoRegion } from "@/lib/gallery";
+import {
+  featuredVideos,
+  videoRegions,
+  videos,
+  type Video,
+  type VideoRegion,
+} from "@/lib/gallery";
 import { cn } from "@/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -109,6 +115,76 @@ function PlayerModal({
   );
 }
 
+function FeaturedCard({
+  video,
+  onOpen,
+  large,
+}: {
+  video: Video;
+  onOpen: () => void;
+  large?: boolean;
+}) {
+  return (
+    <motion.button
+      layout
+      type="button"
+      onClick={onOpen}
+      className={cn(
+        "group relative block w-full overflow-hidden rounded-[1.75rem] text-left outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2",
+        large
+          ? "aspect-[16/10] lg:col-span-2 lg:aspect-[21/10]"
+          : "aspect-[16/10] sm:aspect-video",
+      )}
+      aria-label={`Play ${video.title}`}
+    >
+      <Image
+        src={video.poster}
+        alt=""
+        fill
+        priority={large}
+        sizes={
+          large
+            ? "(min-width: 1024px) 66vw, 100vw"
+            : "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+        }
+        className="object-cover transition-transform duration-700 group-hover:scale-105"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/40 to-ink/10" />
+      <div
+        className={cn(
+          "absolute inset-0 flex flex-col justify-end",
+          large ? "p-7 sm:p-10" : "p-5",
+        )}
+      >
+        <span className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-brand px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
+          Featured
+        </span>
+        <div className="flex items-center gap-4">
+          <span
+            className={cn(
+              "grid shrink-0 place-items-center rounded-full bg-white/95 text-brand shadow-xl transition-transform duration-300 group-hover:scale-110",
+              large ? "size-16" : "size-12",
+            )}
+          >
+            <Play size={large ? 26 : 20} className="ml-0.5 fill-brand" />
+          </span>
+          <div>
+            <h2
+              className={cn(
+                "font-heading font-extrabold tracking-tight text-white text-pretty",
+                large ? "text-2xl sm:text-3xl" : "text-base",
+              )}
+            >
+              {video.title}
+            </h2>
+            <p className="mt-1 text-sm text-white/70">{video.region}</p>
+          </div>
+        </div>
+      </div>
+    </motion.button>
+  );
+}
+
 function VideoCard({
   video,
   index,
@@ -160,8 +236,6 @@ export function VideosContent() {
   const [filter, setFilter] = useState<Filter>("All");
   const [active, setActive] = useState<Video | null>(null);
 
-  const featured = videos.find((v) => v.featured) ?? videos[0];
-
   const visible = useMemo(
     () => (filter === "All" ? videos : videos.filter((v) => v.region === filter)),
     [filter],
@@ -176,40 +250,15 @@ export function VideosContent() {
       <section className="bg-white px-5 py-14 sm:px-8 sm:py-16">
         <div className="mx-auto max-w-6xl">
           {/* Featured */}
-          <Reveal>
-            <button
-              type="button"
-              onClick={() => setActive(featured)}
-              className="group relative block aspect-[16/10] w-full overflow-hidden rounded-[1.75rem] text-left outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 sm:aspect-[21/9]"
-            >
-              <Image
-                src={featured.poster}
-                alt=""
-                fill
-                priority
-                sizes="100vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/40 to-ink/10" />
-              <div className="absolute inset-0 flex flex-col justify-end p-7 sm:p-10">
-                <span className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-brand px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
-                  Featured film
-                </span>
-                <div className="flex items-center gap-4">
-                  <span className="grid size-16 shrink-0 place-items-center rounded-full bg-white/95 text-brand shadow-xl transition-transform duration-300 group-hover:scale-110">
-                    <Play size={26} className="ml-0.5 fill-brand" />
-                  </span>
-                  <div>
-                    <h2 className="font-heading text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                      {featured.title}
-                    </h2>
-                    <p className="mt-1 text-sm text-white/70">
-                      {featured.region} · Network highlight
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </button>
+          <Reveal className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <FeaturedCard
+              video={featuredVideos[0]}
+              onOpen={() => setActive(featuredVideos[0])}
+              large
+            />
+            {featuredVideos.slice(1).map((v) => (
+              <FeaturedCard key={v.id} video={v} onOpen={() => setActive(v)} />
+            ))}
           </Reveal>
 
           {/* Region filter */}
