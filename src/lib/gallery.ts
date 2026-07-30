@@ -285,8 +285,17 @@ export interface Video {
   region: VideoRegion;
   /** YouTube id — reserved for when the original clips are re-hosted. */
   youtubeId?: string;
+  /** Local file under `public/`, for self-hosted clips. */
+  src?: string;
   poster: string;
   featured?: boolean;
+}
+
+/** A short-form clip with no country/region tag of its own. */
+export interface VideoClip {
+  id: string;
+  title: string;
+  src: string;
 }
 
 const posters = [
@@ -350,6 +359,15 @@ export const featuredVideos: Video[] = featuredRawVideos.map((v) => ({
   youtubeId: v.youtubeId,
   poster: `https://i.ytimg.com/vi/${v.youtubeId}/maxresdefault.jpg`,
   featured: true,
+}));
+
+/** Self-hosted short clips — shown in the "More clips" strip below Featured. */
+const clipNames = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "b1", "b2", "b3"];
+
+export const videoClips: VideoClip[] = clipNames.map((name) => ({
+  id: `clip-${name}`,
+  title: `ALN Clip ${name.toUpperCase()}`,
+  src: gimg("videos/vid", `${name}.mp4`),
 }));
 
 export const videos: Video[] = rawVideos.map((v, i) => ({

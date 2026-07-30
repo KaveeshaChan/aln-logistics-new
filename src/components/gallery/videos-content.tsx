@@ -9,9 +9,11 @@ import { CategoryTabs } from "@/components/gallery/category-tabs";
 import { Reveal } from "@/components/motion/reveal";
 import {
   featuredVideos,
+  videoClips,
   videoRegions,
   videos,
   type Video,
+  type VideoClip,
   type VideoRegion,
 } from "@/lib/gallery";
 import { cn } from "@/lib/utils";
@@ -23,7 +25,7 @@ function PlayerModal({
   video,
   onClose,
 }: {
-  video: Video | null;
+  video: Video | VideoClip | null;
   onClose: () => void;
 }) {
   useEffect(() => {
@@ -70,7 +72,7 @@ function PlayerModal({
             </button>
 
             <div className="relative aspect-video">
-              {video.youtubeId ? (
+              {"youtubeId" in video && video.youtubeId ? (
                 <iframe
                   src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1`}
                   title={video.title}
@@ -78,7 +80,15 @@ function PlayerModal({
                   allowFullScreen
                   className="absolute inset-0 size-full"
                 />
-              ) : (
+              ) : video.src ? (
+                <video
+                  src={video.src}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="absolute inset-0 size-full bg-black object-contain"
+                />
+              ) : "poster" in video ? (
                 <>
                   <Image
                     src={video.poster}
@@ -106,7 +116,7 @@ function PlayerModal({
                     </a>
                   </div>
                 </>
-              )}
+              ) : null}
             </div>
           </motion.div>
         </motion.div>
@@ -232,9 +242,52 @@ function VideoCard({
   );
 }
 
+function ClipCard({
+  clip,
+  index,
+  onOpen,
+}: {
+  clip: VideoClip;
+  index: number;
+  onOpen: () => void;
+}) {
+  return (
+    <motion.button
+      layout
+      type="button"
+      onClick={onOpen}
+      initial={{ opacity: 0, y: 22 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -12 }}
+      transition={{ duration: 0.5, delay: (index % 8) * 0.05, ease }}
+      className="group relative block aspect-video w-full overflow-hidden rounded-2xl bg-neutral-900 text-left outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+      aria-label={`Play ${clip.title}`}
+    >
+      <video
+        src={`${clip.src}#t=0.1`}
+        muted
+        playsInline
+        preload="metadata"
+        className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-110"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" />
+
+      <span className="absolute left-1/2 top-1/2 grid size-13 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-brand shadow-xl transition-all duration-300 group-hover:scale-110 group-hover:bg-white">
+        <Play size={20} className="ml-0.5 fill-brand" />
+      </span>
+
+      <span className="absolute inset-x-0 bottom-0 p-4">
+        <span className="block font-heading text-sm font-bold text-white text-pretty">
+          {clip.title}
+        </span>
+      </span>
+    </motion.button>
+  );
+}
+
 export function VideosContent() {
   const [filter, setFilter] = useState<Filter>("All");
-  const [active, setActive] = useState<Video | null>(null);
+  const [active, setActive] = useState<Video | VideoClip | null>(null);
 
   const visible = useMemo(
     () => (filter === "All" ? videos : videos.filter((v) => v.region === filter)),
@@ -259,6 +312,23 @@ export function VideosContent() {
             {featuredVideos.slice(1).map((v) => (
               <FeaturedCard key={v.id} video={v} onOpen={() => setActive(v)} />
             ))}
+          </Reveal>
+
+          {/* More clips */}
+          <Reveal className="mt-12">
+            <h2 className="font-heading text-lg font-extrabold tracking-tight text-neutral-900">
+              More from the network
+            </h2>
+            <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {videoClips.map((clip, i) => (
+                <ClipCard
+                  key={clip.id}
+                  clip={clip}
+                  index={i}
+                  onOpen={() => setActive(clip)}
+                />
+              ))}
+            </div>
           </Reveal>
 
           {/* Region filter */}
