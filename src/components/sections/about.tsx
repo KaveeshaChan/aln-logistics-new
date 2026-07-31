@@ -26,8 +26,8 @@ const points = [
 
 const collagePhotos = [
   { src: "/gallery/images/DSC_9095.JPG", alt: "ALN members at the ALN Annual Conference 2023" },
-  { src: "/gallery/images/DSC_9220.JPG", alt: "An ALN member at the ALN Annual Conference 2023" },
   { src: "/gallery/images/DSC_9145.JPG", alt: "An ALN member at the ALN Annual Conference 2023" },
+  { src: "/gallery/images/DSC_9220.JPG", alt: "An ALN member at the ALN Annual Conference 2023" },
   { src: "/gallery/images/DSC_9110.JPG", alt: "ALN members at the ALN Annual Conference 2023" },
 ];
 
