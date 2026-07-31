@@ -26,8 +26,8 @@ const points = [
 
 const collagePhotos = [
   { src: "/gallery/images/DSC_9095.JPG", alt: "ALN members at the ALN Annual Conference 2023" },
-  { src: "/gallery/images/DSC_9145.JPG", alt: "An ALN member at the ALN Annual Conference 2023" },
   { src: "/gallery/images/DSC_9220.JPG", alt: "An ALN member at the ALN Annual Conference 2023" },
+  { src: "/gallery/images/DSC_9145.JPG", alt: "An ALN member at the ALN Annual Conference 2023" },
   { src: "/gallery/images/DSC_9110.JPG", alt: "ALN members at the ALN Annual Conference 2023" },
 ];
 
@@ -75,12 +75,12 @@ export function About() {
             </motion.div>
           </Reveal>
 
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, x: -24 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.6, delay: 0.35, ease }}
-            className="absolute -left-3 top-6"
+            className="absolute -left-12 bottom-70"
           >
             <motion.div
               animate={{ y: [0, -8, 0] }}
@@ -101,7 +101,7 @@ export function About() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.6, delay: 0.5, ease }}
-            className="absolute -right-4 top-16 hidden sm:block"
+            className="absolute -right-2 -bottom-8 hidden sm:block"
           >
             <motion.div
               animate={{ y: [0, 8, 0] }}
@@ -120,7 +120,7 @@ export function About() {
                 Years of trust
               </p>
             </motion.div>
-          </motion.div>
+          </motion.div> */}
         </div>
 
         {/* Copy */}
