@@ -1,8 +1,11 @@
 -- Seed data for network_members, converted from the previous hardcoded
 -- src/lib/network-members.ts (source: automobile_logistics_network_members.csv).
--- Run once in phpMyAdmin after creating the table with database/schema.sql.
+-- Run once in the Supabase SQL Editor after creating the table with
+-- database/schema.sql. OVERRIDING SYSTEM VALUE is required because `id` is
+-- an identity column and this insert supplies explicit ids.
 
-INSERT INTO network_members (id, member, country, country_code, company, url, email, phone) VALUES
+INSERT INTO network_members (id, member, country, country_code, company, url, email, phone)
+OVERRIDING SYSTEM VALUE VALUES
 (1, 'Volodymyr Huz', 'Ukraine', 'UA', 'Global Ocean Link Ukraine', 'https://www.gol.ua', 'v.huz@gol.ua', '+380 503397321'),
 (2, 'WILLIAM FABIAN PEÃA VENTURIELLO', 'URUGUAY', 'UY', 'WORLD GLOBAL LOGISTIC S.A.', 'https://www.wglogistic.com', 'william.pena@wglogistic.com', '+59893905852'),
 (3, 'Farai Madzinga', 'ZIMBABWE', 'ZW', 'BIN LAW FREIGHT', 'https://www.bin-law.co.zw', 'fmadzinga@bin-law.co.zw', '+263242661557'),
@@ -93,4 +96,6 @@ INSERT INTO network_members (id, member, country, country_code, company, url, em
 (88, 'Hung Van Le', 'Viet Nam', 'VN', 'VNFT GROUP CO LTD', 'Http://vnftgroup.com', 'anny@vnftgroup.com', '+84709722369'),
 (89, 'Mr. Bryan Sikalubya', 'Zambia', 'ZM', 'Networld Logistics Zambia Limited', 'https://WWW.NETWORLDLOGISTICS.NET', 'Bryan@networldlogistics.co.zm', '+260975 164574');
 
-ALTER TABLE network_members AUTO_INCREMENT = 90;
+-- Advances the identity sequence past the explicit ids above, so the next
+-- INSERT from the app (no explicit id) gets 90, not a clash with row 1.
+SELECT setval(pg_get_serial_sequence('network_members', 'id'), (SELECT max(id) FROM network_members));

@@ -1,202 +1,203 @@
-# ALN Member Login — How It Works
+# ALN Member Login — How It Works (Supabase)
 
-This document covers the login system: the `users` table, the PHP
-endpoints, and how the React side wires into them. For general deployment
-(build + upload to cPanel), see [README.md](README.md) first — this builds
-on that same static-export architecture.
+This document covers the login system: Supabase Auth, the `profiles` and
+`network_members` tables, and how the React side wires into them. For
+general deployment (build + upload to cPanel), see
+[README.md](README.md) first — this builds on that same static-export
+architecture.
 
-## Why PHP instead of Next.js API routes
+## Why Supabase instead of PHP + MySQL
 
 The site is a static export (`output: "export"` in `next.config.ts`) because
 cPanel has no Node.js runtime — see README.md for the full reasoning. That
-means literal Next.js `app/api/**/route.ts` files can't run here; there's no
-server to execute them. So, same as the quote form's `send-quote.php`,
-login is handled by plain PHP scripts under `public/api/` that get copied
-into the exported site and run on cPanel's Apache+PHP directly, using
-sessions + MySQL instead of Next.js server features.
+used to mean auth and the network directory had to be served by PHP scripts
+under `public/api/`, since literal Next.js `app/api/**/route.ts` files can't
+run without a server.
+
+Supabase removes that requirement entirely for data access: the browser
+talks directly to Supabase's hosted Auth and REST APIs over HTTPS using the
+public **anon key**, and Postgres **Row Level Security (RLS)** policies —
+not a backend process — decide what each request is allowed to read or
+write. That's exactly the shape a static export needs. `send-quote.php` and
+`send-contact.php` are untouched — they only send email, so they still make
+sense as plain PHP.
 
 ## Architecture at a glance
 
 ```
-Browser                          cPanel (Apache + PHP)
-┌─────────────────────┐          ┌──────────────────────────┐
-│ LoginForm            │  POST   │ /api/login.php            │
-│ (src/components/     │ ──────► │  - checks users table     │
-│  auth/login-form.tsx)│         │  - password_verify()      │
-│                       │ ◄────── │  - starts PHP session     │
-└─────────┬─────────────┘  JSON  └──────────┬────────────────┘
-          │                                  │ session cookie
-          │ every page loads AuthProvider    │ (aln_session)
-          ▼                                  ▼
-┌─────────────────────┐          ┌──────────────────────────┐
-│ AuthProvider          │  GET   │ /api/me.php                │
-│ (src/lib/             │──────► │  - reads session           │
-│  auth-context.tsx)    │◄────── │  - returns user or 401     │
-└─────────┬─────────────┘  JSON  └──────────────────────────┘
-          │
-          ▼
-┌─────────────────────┐
-│ AccountContent        │  redirects to /login/ if not authenticated,
-│ (src/components/      │  otherwise shows the signed-in dashboard
-│  account/account-     │
-│  content.tsx)          │
-└───────────────────────┘
+Browser                                    Supabase (hosted)
+┌──────────────────────┐   signInWithPassword()   ┌───────────────────────────┐
+│ LoginForm             │ ───────────────────────► │ Auth                      │
+│ (src/components/      │ ◄─────────────────────── │  - verifies email+password│
+│  auth/login-form.tsx) │      session (JWT)        │  - issues a session       │
+└─────────┬─────────────┘                           └──────────┬────────────────┘
+          │                                                     │
+          ▼                                                     ▼
+┌──────────────────────┐   select from profiles    ┌───────────────────────────┐
+│ AuthProvider          │ ───────────────────────► │ Postgres                  │
+│ (src/lib/              │ ◄─────────────────────── │  - profiles (username,role)│
+│  auth-context.tsx)    │       role, username       │  - network_members         │
+└─────────┬─────────────┘                           │  - RLS policies gate all   │
+          ▼                                          │    reads/writes            │
+┌──────────────────────┐                             └───────────────────────────┘
+│ AccountContent         │  redirects to /login/ if not authenticated,
+│ (src/components/       │  otherwise shows the signed-in dashboard
+│  account/account-      │
+│  content.tsx)           │
+└─────────────────────────┘
 ```
 
-Because this is a static multi-page site (plain `<a>` tags, full page loads
-between routes — no client router), there's no persistent JS state to carry
-auth across pages. `AuthProvider` re-checks `/api/me.php` on every page
-mount instead, using the session cookie as the source of truth. That's also
-why page "protection" is client-side only: the static HTML for `/account/`
-always loads, and `AccountContent` decides — after the session check
-resolves — whether to show the dashboard or redirect to `/login/`. There's
-no server available to block the HTML request itself, the way a Node
-server-rendered app could.
+The Supabase JS client persists the session in the browser's `localStorage`
+and attaches it to every request automatically, including across full page
+loads — so unlike the old PHP-session version, pages don't strictly need a
+network round-trip just to know "is there a session at all". `AuthProvider`
+still re-fetches the `profiles` row on mount, since the role it returns is
+authoritative and RLS enforces it server-side regardless of what the client
+believes.
 
 ## One-time setup
 
-### 1. Create the database and table
+### 1. Create a Supabase project
 
-In cPanel: **MySQL Databases** → create a database and a user, and add that
-user to the database with **All Privileges**. Note the exact database name,
-username, and password — cPanel usually prefixes them with your account
-name (e.g. `cpaneluser_aln`).
+Go to [supabase.com](https://supabase.com), sign in, and create a new
+project (pick any region close to your users). Note the **Project URL** and
+the **anon public key** from **Project Settings → Data API / API Keys** —
+you'll need both in step 3.
 
-Open **phpMyAdmin**, select the new database, go to the **SQL** tab, and run
-[`database/schema.sql`](database/schema.sql). This creates one table:
+### 2. Run the schema
 
-| column       | type                          |
-|--------------|-------------------------------|
-| `id`         | `INT UNSIGNED AUTO_INCREMENT` |
-| `username`   | `VARCHAR(50)`, unique         |
-| `password`   | `VARCHAR(255)` (a bcrypt hash, never plaintext) |
-| `role`       | `ENUM('Admin', 'User')`       |
-| `created_at` | `TIMESTAMP`                   |
+Open **SQL Editor** in the Supabase Dashboard → **New query**, paste the
+contents of [`database/schema.sql`](database/schema.sql), and click **Run**.
+This creates:
 
-### 2. Configure the credentials
+| table/function            | purpose                                                            |
+|----------------------------|---------------------------------------------------------------------|
+| `profiles`                 | `id` (matches an `auth.users` id), `username`, `role` (`Admin`/`User`) |
+| `network_members`          | the Admin dashboard's network directory                             |
+| `get_email_for_username()` | looks up the email for a username so login can accept a username    |
+| `is_admin()`                | used by `network_members`'s write policies                          |
+
+Then run [`database/seed-network-members.sql`](database/seed-network-members.sql)
+the same way to load the existing directory (89 rows).
+
+### 3. Configure the credentials
 
 ```bash
-cp public/api/config.example.php public/api/config.php
+cp .env.local.example .env.local
 ```
 
-Edit `public/api/config.php` with the real host/dbname/user/pass from step
-1. This file is gitignored — it never gets committed — but it does need to
-exist locally before `npm run build`, because `next build` copies everything
-in `public/` into `out/` verbatim, the same way `send-quote.php` ships
-automatically. As long as `public/api/config.php` exists at build time, it's
-included in every `out/` you upload.
+Edit `.env.local` with the Project URL and anon key from step 1:
 
-### 3. Create your first users
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-public-key
+```
+
+`.env.local` is gitignored — it never gets committed — but it does need to
+exist before `npm run build`, because `NEXT_PUBLIC_*` vars are baked into
+the exported JS bundle at build time, the same way `public/api/config.php`
+had to exist before the old PHP-based build. Set the same two variables in
+any CI environment that runs the build.
+
+### 4. Create your first users
 
 There's no signup flow wired up yet — with only a couple of accounts and two
-fixed roles, it's simpler (and safer) to add them directly. Generate a
-password hash locally:
+fixed roles, it's simpler (and safer) to add them directly, same as before:
 
-```bash
-php scripts/hash-password.php "the-real-password"
-```
+1. In the Dashboard, go to **Authentication → Users → Add user**. Enter an
+   email and password, and check **Auto Confirm User** (there's no email
+   step in this flow). Click **Create user** and copy the generated **User
+   UID**.
+2. In **SQL Editor**, link that user to a username and role:
 
-Copy the output (starts with `$2y$...`) into an INSERT statement in
-phpMyAdmin's SQL tab:
+   ```sql
+   INSERT INTO profiles (id, username, role)
+   VALUES ('paste-the-user-uid-here', 'admin', 'Admin');
+   ```
 
-```sql
-INSERT INTO users (username, password, role)
-VALUES ('admin', '$2y$10$paste-the-hash-here', 'Admin');
-```
-
-Repeat with `'User'` as the role for regular member accounts. `scripts/`
-is not inside `public/`, so it's never bundled into the deployed site.
+   Repeat with `'User'` as the role for regular member accounts. The
+   `username` is what members type into the login form — the email from
+   step 1 is only used internally by Supabase Auth.
 
 ## How a login actually happens
 
-1. User submits `LoginForm` (`src/components/auth/login-form.tsx`) →
-   calls `login(username, password)` from `useAuth()`.
-2. `AuthProvider` (`src/lib/auth-context.tsx`) `POST`s JSON to
-   `/api/login.php`.
-3. `login.php` looks up the username, runs `password_verify()` against the
-   stored hash, and — on success — starts a PHP session (`aln_session`
-   cookie, `HttpOnly`, `SameSite=Lax`, `Secure` when served over HTTPS) and
-   stores `{id, username, role}` in `$_SESSION["user"]`.
-4. On success, the form redirects to `/account/`.
-5. `/account/` renders `AccountContent`, which calls `/api/me.php` (via
-   `AuthProvider`'s mount effect) to confirm the session and fetch the
-   user's role, then shows the dashboard — or redirects to `/login/` if
-   there's no valid session.
-6. "Log out" calls `/api/logout.php`, which destroys the session, then
+1. User submits `LoginForm` (`src/components/auth/login-form.tsx`) → calls
+   `login(username, password)` from `useAuth()`.
+2. `AuthProvider` (`src/lib/auth-context.tsx`) calls the `get_email_for_username`
+   RPC to resolve the username to an email, then
+   `supabase.auth.signInWithPassword({ email, password })`.
+3. On success, Supabase issues a session (stored in `localStorage`), and
+   `AuthProvider` fetches the matching `profiles` row for the username and
+   role.
+4. The form redirects to `/account/`.
+5. `/account/` renders `AccountContent`, which reads `user` from
+   `useAuth()` (backed by the steps above) and shows the dashboard, or
+   redirects to `/login/` if there's no session.
+6. "Log out" calls `supabase.auth.signOut()`, which clears the session, then
    redirects to `/login/`.
 
 ## File map
 
 | File | Purpose |
 |---|---|
-| `database/schema.sql` | `users` table definition — run once in phpMyAdmin |
-| `scripts/hash-password.php` | Local CLI to generate a bcrypt hash for seeding users |
-| `public/api/config.example.php` | Credential template — copy to `config.php` (gitignored) |
-| `public/api/db.php` | Shared PDO/MySQL connection |
-| `public/api/session.php` | Shared session-cookie bootstrap |
-| `public/api/login.php` | Verifies credentials, starts the session |
-| `public/api/me.php` | Returns the current session's user, or 401 |
-| `public/api/logout.php` | Destroys the session |
+| `database/schema.sql` | `profiles` + `network_members` tables, RLS policies, helper functions — run once in the Supabase SQL Editor |
+| `database/seed-network-members.sql` | Loads the existing 89-row network directory |
+| `.env.local.example` | Credential template — copy to `.env.local` (gitignored) |
+| `src/lib/supabase/client.ts` | Shared browser Supabase client |
 | `src/lib/auth-context.tsx` | React context: `user`, `loading`, `login()`, `logout()` |
+| `src/lib/network-members.ts` | Type + Supabase CRUD for the network directory |
 | `src/components/auth/login-form.tsx` | Wires the existing login UI to `useAuth()` |
 | `src/app/account/page.tsx`, `src/components/account/account-content.tsx` | The protected member dashboard |
 
 ## Security notes
 
-- Passwords are hashed with PHP's `password_hash()` (bcrypt) and checked
-  with `password_verify()` — never stored or compared as plaintext.
-- All queries use PDO prepared statements (no string-concatenated SQL).
-- `login.php` returns the same generic error for a wrong password and an
-  unknown username, so the endpoint can't be used to enumerate accounts.
-- Session cookies are `HttpOnly` (unreachable from JS) and `SameSite=Lax`;
-  `Secure` turns on automatically once the site is served over HTTPS.
-- `session_regenerate_id(true)` runs on every successful login to prevent
-  session fixation.
+- Passwords are never handled by this app's own code — Supabase Auth stores
+  and verifies them.
+- All data access goes through Postgres RLS policies (see
+  `database/schema.sql`): any authenticated user can read `network_members`;
+  only Admins can insert/update/delete; users can only read their own
+  `profiles` row.
+- `get_email_for_username` and `is_admin` are `SECURITY DEFINER` functions
+  with a locked-down `search_path`, deliberately narrow in what they expose
+  (an email for a valid username; a boolean for the current user) — they
+  don't give the client broader access to `auth.users` or `profiles`.
+- The anon key is meant to be public and ships in the JS bundle; it is safe
+  specifically because RLS — not the key — is what enforces access control.
 - **Not included, worth adding if this becomes public-facing beyond a
   handful of known accounts:** login rate limiting / lockout after repeated
-  failures, and a CAPTCHA if `login.php` ever gets targeted by bots. With
-  only a few known member accounts this is a reasonable initial trade-off,
-  not an oversight — revisit if the member base grows.
+  failures (Supabase Auth has some built-in protections, but review them),
+  and a CAPTCHA if brute-forcing becomes a concern.
 
 ## What's not built yet
 
 - **Signup.** The `/signup` form and page already exist in the UI but don't
   submit anywhere — by design, matching the "few, manually-added accounts"
-  setup above. Wiring it to actually `INSERT` into `users` (defaulting
-  `role` to `'User'`) is a small follow-up if self-service registration is
-  wanted later.
+  setup above. Wiring it to call `supabase.auth.signUp()` and insert a
+  matching `profiles` row (defaulting `role` to `'User'`) is a small
+  follow-up if self-service registration is wanted later.
 - **Role-gated content beyond the dashboard.** `/account/` currently just
   shows "you're signed in as Admin/User" — there's no Admin-only panel with
   real functionality yet, since none was requested.
 - **Password reset.** The "Forgot password?" link on the login form is
-  still a no-op.
+  still a no-op — Supabase Auth supports `resetPasswordForEmail()`, but it
+  isn't wired up.
+- **Image uploads.** The Add/Edit Member dialog's logo/photo fields still
+  only create local preview URLs (`URL.createObjectURL`) — this was true
+  before the Supabase migration too. Real uploads would use
+  [Supabase Storage](https://supabase.com/docs/guides/storage) buckets, but
+  that wasn't part of this migration's scope.
 
-## Testing it locally before deploying
-
-You won't have MySQL wired to `next dev` locally unless you set one up, but
-you can verify the PHP side in isolation with any local PHP install:
-
-```bash
-php -S localhost:8080 -t out   # after `npm run build`, from repo root
-```
-
-Then exercise the endpoints directly:
+## Testing it locally
 
 ```bash
-# Should fail — wrong password
-curl -i -X POST http://localhost:8080/api/login.php \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"wrong"}'
-
-# Should succeed and set a session cookie
-curl -i -c cookies.txt -X POST http://localhost:8080/api/login.php \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"the-real-password"}'
-
-# Should return the same user, using the cookie from the login above
-curl -i -b cookies.txt http://localhost:8080/api/me.php
+npm run dev
 ```
 
-If `config.php` is missing, every endpoint returns a `500` with an explicit
-"Missing public/api/config.php" message rather than a cryptic PHP error —
-that's the first thing to check if requests fail after a fresh deploy.
+Since Supabase is a hosted service, `next dev` talks to your real Supabase
+project directly (there's nothing to run locally) — just make sure
+`.env.local` is filled in first. Visit `/login/` and sign in with a user
+created in step 4 above.
+
+If `.env.local` is missing or incomplete, `src/lib/supabase/client.ts`
+throws immediately with an explicit message naming the missing variable(s)
+— that's the first thing to check if the app fails to even render.

@@ -35,18 +35,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { NetworkMember } from "@/lib/network-members";
+import {
+  createNetworkMember,
+  deleteNetworkMember,
+  listNetworkMembers,
+  updateNetworkMember,
+  type NetworkMember,
+} from "@/lib/network-members";
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
-
-async function parseJsonError(res: Response, fallback: string): Promise<string> {
-  try {
-    const data = await res.json();
-    return typeof data?.error === "string" ? data.error : fallback;
-  } catch {
-    return fallback;
-  }
-}
 
 function initialsFor(member: NetworkMember) {
   const source = member.member || member.company;
@@ -70,13 +67,9 @@ export function NetworkMembersTable({ readOnly = false }: { readOnly?: boolean }
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/network-members.php", { credentials: "same-origin" })
-      .then(async (res) => {
-        if (!res.ok) throw new Error(await parseJsonError(res, "Failed to load members."));
-        return res.json();
-      })
+    listNetworkMembers()
       .then((data) => {
-        if (!cancelled) setMembers(data.members ?? []);
+        if (!cancelled) setMembers(data);
       })
       .catch((err) => {
         if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load members.");
@@ -92,15 +85,8 @@ export function NetworkMembersTable({ readOnly = false }: { readOnly?: boolean }
   const handleAdd = async (newMember: Omit<NetworkMember, "id">) => {
     setError(null);
     try {
-      const res = await fetch("/api/network-members.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-        body: JSON.stringify(newMember),
-      });
-      if (!res.ok) throw new Error(await parseJsonError(res, "Failed to add member."));
-      const data = await res.json();
-      setMembers((prev) => [data.member, ...prev]);
+      const created = await createNetworkMember(newMember);
+      setMembers((prev) => [created, ...prev]);
       setSearch("");
       setPageIndex(0);
     } catch (err) {
@@ -111,15 +97,8 @@ export function NetworkMembersTable({ readOnly = false }: { readOnly?: boolean }
   const handleSave = async (updated: NetworkMember) => {
     setError(null);
     try {
-      const res = await fetch("/api/network-members.php", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-        body: JSON.stringify(updated),
-      });
-      if (!res.ok) throw new Error(await parseJsonError(res, "Failed to save member."));
-      const data = await res.json();
-      setMembers((prev) => prev.map((m) => (m.id === data.member.id ? data.member : m)));
+      const saved = await updateNetworkMember(updated);
+      setMembers((prev) => prev.map((m) => (m.id === saved.id ? saved : m)));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save member.");
     }
@@ -128,13 +107,7 @@ export function NetworkMembersTable({ readOnly = false }: { readOnly?: boolean }
   const handleDelete = async (id: number) => {
     setError(null);
     try {
-      const res = await fetch("/api/network-members.php", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-        body: JSON.stringify({ id }),
-      });
-      if (!res.ok) throw new Error(await parseJsonError(res, "Failed to delete member."));
+      await deleteNetworkMember(id);
       setMembers((prev) => prev.filter((m) => m.id !== id));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete member.");

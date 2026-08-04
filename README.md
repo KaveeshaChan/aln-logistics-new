@@ -13,14 +13,14 @@ animation — into a folder of plain `.html`/`.css`/`.js` files via **static
 export**. Upload that folder to `public_html` and the site runs on any
 Apache/PHP host, byte-for-byte the same UI and motion you see in `next dev`,
 because it's the exact same compiled React bundle — nothing is
-reimplemented. The parts of this app that genuinely need a server — the
-quote form's email delivery and the member login — run as small PHP
-endpoints under `public/api/` and `public/send-quote.php`, backed by
-cPanel's PHP and MySQL.
+reimplemented. The quote/contact forms' email delivery runs as small PHP
+endpoints under `public/`, backed by cPanel's PHP. Member login and the
+network directory talk directly to **Supabase** (hosted Postgres + Auth)
+from the browser — no PHP or MySQL involved for those anymore.
 
 **Setting up member login?** See [AUTH.md](AUTH.md) — it covers the
-database, the PHP endpoints, and how the React side wires into them. This
-document only covers the general static-export deployment.
+Supabase project setup, the database schema, and how the React side wires
+into it. This document only covers the general static-export deployment.
 
 ## Why not rewrite it as hand-written HTML/PHP?
 
@@ -66,11 +66,12 @@ document only covers the general static-export deployment.
 4. **`public/.htaccess`** (new) — tells Apache to serve `404.html` for
    missing pages and disables directory listing. Also copied automatically.
 
-5. **Member login** (new) — `public/api/*.php` + a `users` MySQL table
-   power the existing `/login` and `/signup`-adjacent auth UI, plus a new
-   `/account` dashboard. This is a bigger enough piece that it has its own
-   doc — see [AUTH.md](AUTH.md) for the database setup, the endpoints, and
-   how the React side wires into them.
+5. **Member login** (new) — `src/lib/supabase/client.ts` + Supabase Auth and
+   Postgres (with Row Level Security) power the existing `/login` and
+   `/signup`-adjacent auth UI, plus a new `/account` dashboard. This is a
+   bigger enough piece that it has its own doc — see [AUTH.md](AUTH.md) for
+   the Supabase project setup, the database schema, and how the React side
+   wires into it.
 
 Nothing else about the app changed. Every other page, section, and
 animation is untouched.
@@ -80,8 +81,12 @@ animation is untouched.
 - Node.js + npm on **your own machine** (or a CI runner) to run the build.
   Node is never required on the cPanel server — it only produces the static
   files you upload.
-- A cPanel hosting plan with PHP (used by `send-quote.php` and the login
-  endpoints) and MySQL (used by login — see AUTH.md).
+- A cPanel hosting plan with PHP (used by `send-quote.php` and
+  `send-contact.php`).
+- A [Supabase](https://supabase.com) project (used by member login and the
+  network directory — see AUTH.md). Its URL and anon key must be set in
+  `.env.local` **before** running the build below, since they get baked
+  into the static JS bundle at build time.
 
 ## Build
 
