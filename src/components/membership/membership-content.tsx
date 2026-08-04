@@ -50,9 +50,7 @@ export function MembershipHeader() {
           />
           <Reveal delay={0.15}>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600">
-              One representative per country, appointed to work the network for
-              maximum efficiency — sharing business leads, market intelligence
-              and protected opportunities.
+              ALN brings together carefully selected companies specializing in automobile logistics and automotive cargo from around the world. Members collaborate to develop long-term business relationships, share opportunities, and strengthen their presence within the global automotive logistics industry.
             </p>
           </Reveal>
         </div>
@@ -66,11 +64,12 @@ export function MembershipHeader() {
 /* ------------------------------------------------------------------ */
 
 const criteria = [
-  "Are you equipped with the knowledge and experience in providing logistics services for the import and export of automobiles in your country?",
-  "Is your company able to provide total logistics solutions and services related to automobile logistics in your country?",
-  "Are you confident in developing business contacts with customers engaged in automobile trading, import and export in your country?",
-  "How strong are your contacts to negotiate competitive freight rates with carriers and provide local services at competitive prices to secure business within the member network?",
-  "Is it your interest to develop business opportunities in the automobile logistics trade by cooperating with network members to gain profits for your company?",
+  "Have experience in automobile logistics and/or automotive cargo, including vehicle transportation, RO-RO, containerized vehicle shipments, automotive spare parts, tyres, or related services",
+  "Be capable of providing professional logistics solutions within your local market.",
+  "Maintain a strong reputation for reliability, responsiveness, and customer service.",
+  "Have the ability to build business relationships with vehicle manufacturers, exporters, importers, dealers, freight forwarders, or other companies within the automotive industry.",
+  "Be committed to cooperating with fellow ALN members and responding promptly to business opportunities",
+  "Share ALN's vision of developing long-term partnerships through professionalism, trust, and mutual business growth.",
 ];
 
 export function MembershipCriteria() {
@@ -90,10 +89,7 @@ export function MembershipCriteria() {
             />
             <Reveal delay={0.1}>
               <p className="mt-5 text-base leading-relaxed text-neutral-600">
-                Our goal is to globally appoint an ALN representative in each
-                country — and make them use the network to gain maximum
-                efficiency in working with one another while sharing business
-                leads.
+                ALN is committed to building a trusted global community of qualified automobile logistics professionals. We carefully select companies that demonstrate experience, reliability, and a commitment to developing long-term partnerships within the network.
               </p>
             </Reveal>
           </div>
@@ -127,11 +123,12 @@ export function MembershipCriteria() {
 /* ------------------------------------------------------------------ */
 
 const feeIncludes = [
-  "Trial period to meet members and familiarise with the network",
-  "Permanent membership offered once ALN is satisfied with performance",
-  "Covers administrative costs within the network",
-  "One fee per country — branch offices in the same country included",
-  "Renewable annually with three months' notice of any change",
+  "Complimentary 6-month Trial Membership.",
+  "Opportunity to connect with members and experience the network firsthand.",
+  "Business introductions and networking opportunities during the trial period.",
+  "Companies may choose to continue with Standard Membership (USD 500 per year) after the trial period.",
+  "Membership fee supports the administration, development, and ongoing activities of the network.",
+  "Membership is renewed annually.",
 ];
 
 export function MembershipFee() {
@@ -149,12 +146,10 @@ export function MembershipFee() {
           <div className="p-8 sm:p-12">
             <Eyebrow>Membership fee</Eyebrow>
             <h2 className="mt-4 font-heading text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl">
-              Simple, single annual fee
+              Simple membership structure
             </h2>
             <p className="mt-4 max-w-md text-base leading-relaxed text-neutral-600">
-              ALN gives members exposure to the overall business concept and to
-              the network itself — meet the members, share opportunities, and
-              represent your country.
+              ALN offers selected companies the opportunity to experience the network before making any long-term commitment.
             </p>
             <ul className="mt-8 space-y-3.5">
               {feeIncludes.map((item, i) => (
@@ -185,10 +180,10 @@ export function MembershipFee() {
             />
             <div className="relative">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
-                Permanent membership
+                Standard Membership
               </p>
               <p className="mt-3 font-heading text-6xl font-extrabold tracking-tight">
-                $1,000
+                $500
                 <span className="text-xl font-semibold text-white/70">
                   {" "}
                   / year
@@ -217,10 +212,10 @@ export function MembershipFee() {
                 </Button>
               </motion.div>
               <a
-                href="mailto:admin@autologisticsnetwork.com"
+                href="mailto:admin1@autologisticsnetwork.com"
                 className="text-center text-xs text-white/75 transition-colors hover:text-white"
               >
-                Questions? admin@autologisticsnetwork.com
+                Questions? admin1@autologisticsnetwork.com
               </a>
             </div>
           </div>
@@ -541,10 +536,10 @@ export function MembershipRules() {
           <p className="mt-10 text-center text-sm text-neutral-500">
             Should you have any queries or require assistance, email us at{" "}
             <a
-              href="mailto:admin@autologisticsnetwork.com"
+              href="mailto:admin1@autologisticsnetwork.com"
               className="font-semibold text-brand transition-colors hover:text-brand/80"
             >
-              admin@autologisticsnetwork.com
+              admin1@autologisticsnetwork.com
             </a>{" "}
             — we look forward to welcoming you as the member representing your
             country.
