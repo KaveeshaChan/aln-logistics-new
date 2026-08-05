@@ -190,7 +190,7 @@ export function MembershipFee() {
                 </span>
               </p>
               <p className="mt-3 text-sm text-white/80">
-                Renewable annually · one member per country
+                Renewable annually
               </p>
             </div>
             <div className="relative flex flex-col gap-3">
